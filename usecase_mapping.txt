@@ -1,0 +1,110 @@
+UniConnect: 34 Use Cases and File Mapping Document
+===================================================
+
+This document maps the 34 specific use cases required for the complete UniConnect campus platform, correlating them precisely with the boilerplate files created in the /src directory.
+
+---------------------------------------------------
+PHASE 1: AUTHENTICATION & IDENTITY (UC1 - UC7)
+---------------------------------------------------
+UC1: Student requests an account registration.
+     -> /src/pages/RegisterPage.tsx , /src/services/api.ts
+UC2: System validates university email (@nu.edu.pk).
+     -> /src/pages/RegisterPage.tsx
+UC3: Student verifies identity via 6-digit OTP.
+     -> /src/pages/VerifyStudentPage.tsx
+UC4: Verified student securely logs into the platform.
+     -> /src/pages/LoginPage.tsx , /src/services/api.ts
+UC5: Administrator logs into the dedicated admin portal.
+     -> /src/pages/AdminLoginPage.tsx
+UC6: User requests a password reset link.
+     -> /src/pages/ResetPasswordPage.tsx
+UC7: User successfully resets their forgotten password.
+     -> /src/pages/ResetPasswordPage.tsx
+
+---------------------------------------------------
+PHASE 2: PROFILE & ONBOARDING (UC8 - UC12)
+---------------------------------------------------
+UC8: User sets up their profile avatar.
+     -> /src/components/Avatar.tsx , /src/pages/DashboardPage.tsx
+UC9: User authors and saves a short biography.
+     -> /src/pages/DashboardPage.tsx
+UC10: User inputs current semester and department details.
+      -> /src/pages/RegisterPage.tsx , /src/pages/DashboardPage.tsx
+UC11: System suggests mutual courses based on profile data.
+      -> /src/pages/StudyPartnersPage.tsx
+UC12: User signs out of the platform, destroying local session.
+      -> /src/pages/DashboardPage.tsx , /src/services/api.ts
+
+---------------------------------------------------
+PHASE 3: STUDY PARTNERS & MATCHING (UC13 - UC17)
+---------------------------------------------------
+UC13: Student searches for peers in the same department.
+      -> /src/pages/StudyPartnersPage.tsx
+UC14: Student filters peers based on specific courses.
+      -> /src/pages/StudyPartnersPage.tsx
+UC15: System displays peer cards with basic info and ratings.
+      -> /src/components/StudentCard.tsx , /src/pages/StudyPartnersPage.tsx
+UC16: Student sends a connection/study request to a peer.
+      -> /src/pages/StudyPartnersPage.tsx
+UC17: Student accepts or declines an incoming study request.
+      -> /src/pages/StudyPartnersPage.tsx
+
+---------------------------------------------------
+PHASE 4: STUDY GROUPS & COLLABORATION (UC18 - UC23)
+---------------------------------------------------
+UC18: User creates a new study group (Private or Public).
+      -> /src/pages/StudyGroupsPage.tsx , /src/components/Modal.tsx
+UC19: Creator sets member limits and designates course codes.
+      -> /src/pages/StudyGroupsPage.tsx , /src/components/FormField.tsx
+UC20: User browses available public study groups.
+      -> /src/pages/StudyGroupsPage.tsx
+UC21: User joins a public study group.
+      -> /src/pages/StudyGroupsPage.tsx
+UC22: Group creator posts important announcements.
+      -> /src/pages/StudyGroupsPage.tsx
+UC23: Member leaves a study group.
+      -> /src/pages/StudyGroupsPage.tsx
+
+---------------------------------------------------
+PHASE 5: RESOURCE MARKETPLACE (UC24 - UC29)
+---------------------------------------------------
+UC24: User browses available resources (Books, Equipment, Notes).
+      -> /src/pages/ResourcesPage.tsx
+UC25: User views resource conditions, limits, and statuses.
+      -> /src/components/ResourceCard.tsx , /src/components/StatusBadge.tsx
+UC26: User posts a new resource to share on the platform.
+      -> /src/pages/ResourcesPage.tsx , /src/components/Modal.tsx
+UC27: User requests to borrow an available resource.
+      -> /src/pages/ResourcesPage.tsx
+UC28: Owner approves or rejects resource borrow requests.
+      -> /src/pages/ResourcesPage.tsx
+UC29: Owner flags an item as damaged/lost upon its return.
+      -> /src/pages/ResourcesPage.tsx
+
+---------------------------------------------------
+PHASE 6: REPUTATION & RATING SYSTEM (UC30 - UC31)
+---------------------------------------------------
+UC30: Student leaves a star rating for a peer after studying.
+      -> /src/components/StarRating.tsx , /src/pages/StudyPartnersPage.tsx
+UC31: Student leaves a star rating for a resource exchange.
+      -> /src/components/StarRating.tsx , /src/pages/ResourcesPage.tsx
+
+---------------------------------------------------
+PHASE 7: ADMINISTRATIVE PORTAL (UC32 - UC34)
+---------------------------------------------------
+UC32: System displays real-time statistics (users, resources).
+      -> /src/pages/AdminLoginPage.tsx (and hidden admin shell) , /src/components/StatCard.tsx
+UC33: Admin monitors system alerts for flagged components.
+      -> /src/components/EmptyState.tsx , /src/components/Badge.tsx
+UC34: Admin issues a temporary block on a violating student profile.
+      -> /src/services/api.ts (Admin endpoints)
+
+---------------------------------------------------
+UTILITIES & UI ARCHITECTURE
+---------------------------------------------------
+* Consistent UI headers implemented across all views.
+  -> /src/components/SectionHeader.tsx
+* Tab-based navigation within main views.
+  -> /src/components/Tabs.tsx
+* Real-time theming adjustments via service integrations.
+  -> /src/services/theme.ts
