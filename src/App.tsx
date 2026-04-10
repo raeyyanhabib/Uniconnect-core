@@ -1,121 +1,267 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Users, Layers, Package, BarChart2, UserCheck, Flag, Settings, HelpCircle, MapPin, Search, BookOpen, MessageSquare, Bell, User, LogOut } from 'lucide-react';
+import { C } from './services/theme';
+import type {  User as UserType  } from './types';
+import Avatar from './components/Avatar';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Import Pages
+import LoginPage from './pages/LoginPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import RegisterPage from './pages/RegisterPage';
+import VerifyStudentPage from './pages/VerifyStudentPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import DashboardPage from './pages/DashboardPage';
+import ProfilePage from './pages/ProfilePage';
+import StudyPartnersPage from './pages/StudyPartnersPage';
+import StudyGroupsPage from './pages/StudyGroupsPage';
+import ResourcesPage from './pages/ResourcesPage';
+import MessagesPage from './pages/MessagesPage';
+import NotificationsPage from './pages/NotificationsPage';
+import LostFoundPage from './pages/LostFoundPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminUsersPage from './pages/AdminUsersPage';
+import AdminResourcesPage from './pages/AdminResourcesPage';
+import AdminReportsPage from './pages/AdminReportsPage';
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+interface NavItem { id: string; label: string; icon: React.ElementType; badge?: number; }
+interface NavGroup { label: string; items: NavItem[]; }
 
-      <div className="ticks"></div>
+const navGroups: NavGroup[] = [
+  {
+    label: "Main",
+    items: [
+      { id: "dashboard", label: "Dashboard", icon: BarChart2 },
+      { id: "studyPartners", label: "Study Partners", icon: Users },
+      { id: "studyGroups", label: "Study Groups", icon: Layers },
+      { id: "resources", label: "Resource Market", icon: Package },
+    ],
+  },
+  {
+    label: "Connect",
+    items: [
+      { id: "messages", label: "Messages", icon: MessageSquare, badge: 2 },
+      { id: "notifications", label: "Notifications", icon: Bell, badge: 3 },
+      { id: "lostFound", label: "Lost & Found", icon: MapPin },
+    ],
+  },
+];
+const adminNavGroups: NavGroup[] = [
+  {
+    label: "Admin Panel",
+    items: [
+      { id: "adminDashboard", label: "Dashboard", icon: BarChart2 },
+      { id: "adminUsers", label: "Manage Users", icon: UserCheck },
+      { id: "adminResources", label: "Resource Listings", icon: Package },
+      { id: "adminReports", label: "Platform Reports", icon: Flag },
+    ],
+  },
+];
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+interface SidebarProps {
+  currentPage: string;
+  onNavigate: (page: string) => void;
+  user?: UserType | null;
+  isAdmin?: boolean;
 }
 
-export default App
+function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps) {
+  const groups = isAdmin ? adminNavGroups : navGroups;
+  return (
+    <div style={{ width: 224, background: C.depth, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", height: "100%", flexShrink: 0 }}>
+      <div style={{ padding: "20px 18px 16px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 9, background: `linear-gradient(135deg,${C.cyan},${C.purple})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <BookOpen size={16} color="#fff" />
+          </div>
+          <span style={{ fontWeight: 900, fontSize: 17, background: `linear-gradient(135deg,${C.cyanLt},${C.purple})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>UniConnect</span>
+        </div>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px 10px" }}>
+        {groups.map(group => (
+          <div key={group.label} style={{ marginBottom: 20 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: C.txM, textTransform: "uppercase", letterSpacing: 1.2, padding: "0 8px", marginBottom: 6 }}>{group.label}</p>
+            {group.items.map(item => {
+              const Icon = item.icon;
+              const active = currentPage === item.id;
+              return (
+                <button key={item.id} className={`sideNavItem${active ? " sideNavActive" : ""}`}
+                  onClick={() => onNavigate(item.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: active ? "rgba(14,165,233,0.1)" : "none", border: active ? `none` : "none", borderRight: active ? `2px solid ${C.cyan}` : "2px solid transparent", borderRadius: active ? "8px 0 0 8px" : 8, padding: "9px 10px", color: active ? C.cyanLt : C.txS, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, textAlign: "left" }}>
+                  <Icon size={16} />
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                  {item.badge && <span style={{ background: C.red, borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>{item.badge}</span>}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: "12px 10px", borderTop: `1px solid ${C.border}` }}>
+        {!isAdmin && (
+          <button className="sideNavItem" onClick={() => onNavigate("profile")}
+            style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: currentPage === "profile" ? "rgba(14,165,233,0.1)" : "none", border: "none", borderRadius: 8, padding: "9px 10px", color: C.txS, cursor: "pointer", fontSize: 13, fontWeight: 500, textAlign: "left", marginBottom: 4 }}>
+            <User size={16} /> Profile
+          </button>
+        )}
+        <button className="sideNavItem" onClick={() => onNavigate("login")}
+          style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderRadius: 8, padding: "9px 10px", color: C.red, cursor: "pointer", fontSize: 13, fontWeight: 500, textAlign: "left", opacity: 0.8 }}>
+          <LogOut size={16} /> Sign Out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface TopBarProps {
+  user: UserType;
+  currentPage: string;
+  onNavigate: (page: string) => void;
+}
+
+function TopBar({ user, currentPage, onNavigate }: TopBarProps) {
+  const pageLabels: Record<string, string> = {
+    dashboard: "Dashboard", studyPartners: "Study Partners", studyGroups: "Study Groups",
+    resources: "Resources", messages: "Messages", notifications: "Notifications",
+    lostFound: "Lost & Found", profile: "Profile", adminDashboard: "Admin Dashboard",
+    adminUsers: "Manage Users", adminResources: "Resource Listings", adminReports: "Platform Reports",
+  };
+  return (
+    <div style={{ height: 58, background: C.depth, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0 }}>
+      <h2 style={{ fontSize: 16, fontWeight: 700, color: C.tx, margin: 0 }}>{pageLabels[currentPage] || "UniConnect"}</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <button onClick={() => onNavigate("notifications")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
+          <Bell size={20} />
+          <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.red }} />
+        </button>
+        <button onClick={() => onNavigate("messages")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
+          <MessageSquare size={20} />
+          <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.cyan }} />
+        </button>
+        <button onClick={() => onNavigate("profile")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 8 }}>
+          <Avatar name={user.name} size={30} />
+          <div style={{ textAlign: "left" }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.tx, margin: 0 }}>{user.name}</p>
+            <p style={{ fontSize: 10, color: C.txM, margin: 0 }}>{user.department || user.role}</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface AppShellProps {
+  user: UserType;
+  currentPage: string;
+  onNavigate: (page: string) => void;
+  isAdmin?: boolean;
+  children: React.ReactNode;
+}
+
+function AppShell({ user, currentPage, onNavigate, isAdmin, children }: AppShellProps) {
+  return (
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      <Sidebar currentPage={currentPage} onNavigate={onNavigate} user={user} isAdmin={isAdmin} />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} />
+        <div style={{ flex: 1, overflowY: "auto", background: C.base }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState("login");
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleLogin = (userData: string) => {
+    try {
+      const user = JSON.parse(userData);
+      const mappedUser: UserType = {
+        userId: user.id || user.userId,
+        name: user.name,
+        email: user.email,
+        department: user.department,
+        semester: user.semester,
+        bio: user.bio,
+        averageRating: user.avgRating || 0,
+        status: user.status || 'active',
+        role: user.role,
+        adminLevel: user.adminLevel || 0,
+      };
+      
+      setCurrentUser(mappedUser);
+      localStorage.setItem('uc_user', JSON.stringify(mappedUser));
+
+      if (user.role === 'admin') {
+        setIsAdmin(true);
+        setCurrentPage("adminDashboard");
+      } else {
+        setIsAdmin(false);
+        setCurrentPage("dashboard");
+      }
+    } catch (e) {
+      console.error("Failed to parse user data on login");
+    }
+  };
+
+  const navigate = (page: string) => {
+    if (page === "login") {
+      setCurrentUser(null);
+      setIsAdmin(false);
+      localStorage.removeItem('uc_user');
+      localStorage.removeItem('uc_token');
+    }
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('uc_user');
+    const savedToken = localStorage.getItem('uc_token');
+    if (savedUser && savedToken) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        if (user.role === 'admin') {
+          setIsAdmin(true);
+          setCurrentPage("adminDashboard");
+        } else {
+          setIsAdmin(false);
+          setCurrentPage("dashboard");
+        }
+      } catch (e) {
+        console.error("Failed to restore session");
+        localStorage.removeItem('uc_user');
+        localStorage.removeItem('uc_token');
+      }
+    }
+  }, []);
+
+  if (currentPage === "login") return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
+  if (currentPage === "adminLogin") return <AdminLoginPage onNavigate={navigate} onLogin={handleLogin} />;
+  if (currentPage === "register") return <RegisterPage onNavigate={navigate} />;
+  if (currentPage === "verifyStudent") return <VerifyStudentPage onNavigate={navigate} />;
+  if (currentPage === "resetPassword") return <ResetPasswordPage onNavigate={navigate} />;
+
+  if (!currentUser) return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
+
+  return (
+    <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin}>
+      {currentPage === "dashboard" && <DashboardPage user={currentUser} onNavigate={navigate} />}
+      {currentPage === "profile" && <ProfilePage user={currentUser} onNavigate={navigate} />}
+      {currentPage === "studyPartners" && <StudyPartnersPage onNavigate={navigate} />}
+      {currentPage === "studyGroups" && <StudyGroupsPage />}
+      {currentPage === "resources" && <ResourcesPage user={currentUser} />}
+      {currentPage === "messages" && <MessagesPage user={currentUser} />}
+      {currentPage === "notifications" && <NotificationsPage user={currentUser} />}
+      {currentPage === "lostFound" && <LostFoundPage user={currentUser} />}
+      
+      {currentPage === "adminDashboard" && isAdmin && <AdminDashboardPage onNavigate={navigate} />}
+      {currentPage === "adminUsers" && isAdmin && <AdminUsersPage user={currentUser} />}
+      {currentPage === "adminResources" && isAdmin && <AdminResourcesPage user={currentUser} />}
+      {currentPage === "adminReports" && isAdmin && <AdminReportsPage user={currentUser} />}
+    </AppShell>
+  );
+}

@@ -1,7 +1,148 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Search, UserPlus, Users, Check, X, MessageSquare, UserMinus } from 'lucide-react';
+import { C, cardStyle, inp, btnP, btnS, btnG, btnD } from '../services/theme';
+import { api } from '../services/api';
+import Badge from '../components/Badge';
+import Avatar from '../components/Avatar';
+import StarRating from '../components/StarRating';
+import SectionHeader from '../components/SectionHeader';
+import Tabs from '../components/Tabs';
+import EmptyState from '../components/EmptyState';
+import StudentCard from '../components/StudentCard';
 
-export default function StudyPartnersPage() {
+export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const [tab, setTab] = useState("search");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deptFilter, setDeptFilter] = useState("All");
+
+  const [discoverableStudents, setDiscoverableStudents] = useState<any[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
+  const [myPartners, setMyPartners] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [searchRes, reqRes, partRes] = await Promise.all([
+          api.get('/api/partners/search'),
+          api.get('/api/partners/requests'),
+          api.get('/api/partners')
+        ]);
+        setDiscoverableStudents(searchRes);
+        setIncomingRequests(reqRes);
+        setMyPartners(partRes);
+      } catch (err) {
+        console.error("Failed to load partners data:", err);
+      }
+    };
+    fetchData();
+  }, [tab]);
+
+  const sendRequest = async (userId: string) => {
+    try {
+      await api.post('/api/partners/requests', { toId: userId });
+      alert("Partner request sent!");
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    }
+  };
+
+  const handleRequestAction = async (id: string, action: "accept" | "decline") => {
+    try {
+      await api.put(`/api/partners/requests/${id}`, { action });
+      setIncomingRequests(reqs => reqs.filter(r => r.id !== id));
+      if (action === "accept") {
+        setMyPartners(await api.get('/api/partners'));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const removePartner = async (partnerId: string) => {
+    try {
+      await api.delete(`/api/partners/${partnerId}`);
+      setMyPartners(pts => pts.filter(p => p.id !== partnerId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const depts = ["All", "Computer Science", "Mathematics", "Physics", "Electrical Engineering"];
+  
+  const filtered = discoverableStudents.filter(s =>
+    (deptFilter === "All" || s.department === deptFilter) &&
+    (searchQuery === "" || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || (s.department || "").toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const tabs = [
+    { id: "search", label: "Search Partners" },
+    { id: "requests", label: "Partner Requests", count: incomingRequests.length },
+    { id: "partners", label: "My Partners", count: myPartners.length },
+  ];
   return (
-    <div>StudyPartnersPage Component</div>
+    <div className="pageAnim" style={{ padding: 28 }}>
+      <SectionHeader title="Study Partners" subtitle="Find and connect with students who share your courses" />
+      <Tabs tabs={tabs} active={tab} onSelect={setTab} />
+      {tab === "search" && (
+        <div>
+          <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: C.txM }} />
+              <input style={{ ...inp, paddingLeft: 36 }} placeholder="Search by name, department, or course…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            </div>
+            <select style={{ ...inp, width: 180, appearance: "none" }} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
+              {depts.map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {filtered.map(student => (
+              <StudentCard key={student.id} student={student} actionEl={
+                student.status === "blocked"
+                  ? <Badge label="Account Blocked" color={C.red} />
+                  : <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => sendRequest(student.id)} style={{ ...btnP, padding: "7px 14px", fontSize: 12 }}>
+                        <UserPlus size={14} /> Send Request
+                      </button>
+                    </div>
+              } />
+            ))}
+          </div>
+        </div>
+      )}
+      {tab === "requests" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {incomingRequests.length === 0
+            ? <EmptyState icon={Users} title="No pending requests" subtitle="Partner requests will appear here" />
+            : incomingRequests.map(req => (
+                <div key={req.id} style={{ ...cardStyle(), display: "flex", alignItems: "center", gap: 16 }}>
+                  <Avatar name={req.fromName} size={46} />
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: 700, color: C.tx, margin: 0 }}>{req.fromName}</p>
+                    <p style={{ fontSize: 12, color: C.txS, margin: "2px 0 6px" }}>{req.fromDept} · Sem {req.fromSemester}</p>
+                    <p style={{ fontSize: 12, color: C.txM, margin: 0 }}>Requested on {new Date(req.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <StarRating rating={req.avgRating || 0} />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => handleRequestAction(req.id, "accept")} style={btnG}><Check size={14} /> Accept</button>
+                    <button onClick={() => handleRequestAction(req.id, "decline")} style={btnD}><X size={14} /> Decline</button>
+                  </div>
+                </div>
+              ))
+          }
+        </div>
+      )}
+      {tab === "partners" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {myPartners.map(partner => (
+            <StudentCard key={partner.id} student={partner} actionEl={
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => onNavigate("messages")} style={{ ...btnP, padding: "7px 14px", fontSize: 12 }}><MessageSquare size={14} /> Message</button>
+                <button onClick={() => removePartner(partner.id)} style={{ ...btnD, padding: "7px 12px", fontSize: 12 }}><UserMinus size={14} /></button>
+              </div>
+            } />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
