@@ -1,4 +1,8 @@
 // routes/messages.js — Direct Messaging (UC 28)
+// Handles all peer-to-peer messaging: listing conversations,
+// fetching message history, and sending new messages.
+// Creates conversations automatically when two users message for the first time.
+
 const express = require('express');
 const crypto = require('crypto');
 const db = require('../db');
@@ -7,9 +11,14 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 router.use(authMiddleware);
 
+
+// Quick UUID generator for new conversations and messages
 function uuid() { return crypto.randomUUID(); }
 
-// Get all conversations for current user
+
+// Get all conversations for the logged-in user.
+// Joins with the Users table to show the other participant's name,
+// and grabs the last message text/time for preview in the sidebar.
 router.get('/', (req, res) => {
   const conversations = db.prepare(`
     SELECT c.*,
@@ -21,10 +30,13 @@ router.get('/', (req, res) => {
     WHERE c.user1Id = ? OR c.user2Id = ?
     ORDER BY lastMessageTime DESC
   `).all(req.user.id, req.user.id, req.user.id);
+
   res.json(conversations);
 });
 
-// Get messages in a conversation
+
+// Get all messages in a specific conversation, ordered chronologically.
+// The "mine" flag tells the frontend which side to render each bubble on.
 router.get('/:id/messages', (req, res) => {
   const messages = db.prepare(`
     SELECT m.*, u.name as senderName,
@@ -34,17 +46,22 @@ router.get('/:id/messages', (req, res) => {
     WHERE m.convId = ?
     ORDER BY m.sentAt ASC
   `).all(req.user.id, req.params.id);
+
   res.json(messages);
 });
 
-// Send a message (creates conversation if needed)
+
+// Send a new message — either to an existing conversation or start a new one.
+// If you provide a toUserId without a conversationId, it checks for an existing
+// conversation between you two (or creates one if needed), then drops the message in.
 router.post('/send', (req, res) => {
   const { toUserId, text, conversationId } = req.body;
+
   if (!text) return res.status(400).json({ error: 'Text is required' });
 
   let convId = conversationId;
 
-  // If no conversation exists, create one
+  // If no conversation ID was given, find or create one with the target user
   if (!convId && toUserId) {
     const existing = db.prepare(`
       SELECT id FROM Conversations
@@ -65,5 +82,6 @@ router.post('/send', (req, res) => {
   db.prepare('INSERT INTO Messages (id, convId, senderId, text) VALUES (?, ?, ?, ?)').run(msgId, convId, req.user.id, text);
   res.status(201).json({ message: 'Message sent', msgId, conversationId: convId });
 });
+
 
 module.exports = router;

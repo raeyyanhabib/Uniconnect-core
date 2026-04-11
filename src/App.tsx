@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Layers, Package, BarChart2, UserCheck, Flag, Settings, HelpCircle, MapPin, Search, BookOpen, MessageSquare, Bell, User, LogOut } from 'lucide-react';
 import { C } from './services/theme';
-import type {  User as UserType  } from './types';
+import type { User as UserType } from './types';
 import Avatar from './components/Avatar';
 
 // Import Pages
@@ -23,9 +23,15 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminResourcesPage from './pages/AdminResourcesPage';
 import AdminReportsPage from './pages/AdminReportsPage';
 
+
+// These define the sidebar navigation structure — what links show up and in what groups.
+// Student nav items are separated from admin nav items so each role gets its own sidebar.
+
 interface NavItem { id: string; label: string; icon: React.ElementType; badge?: number; }
 interface NavGroup { label: string; items: NavItem[]; }
 
+
+// The main navigation links that regular students see on the sidebar
 const navGroups: NavGroup[] = [
   {
     label: "Main",
@@ -45,6 +51,8 @@ const navGroups: NavGroup[] = [
     ],
   },
 ];
+
+// The navigation links that admins see — completely different set of pages
 const adminNavGroups: NavGroup[] = [
   {
     label: "Admin Panel",
@@ -57,6 +65,10 @@ const adminNavGroups: NavGroup[] = [
   },
 ];
 
+
+// The left sidebar component — shows the UniConnect logo at top,
+// navigation links in the middle, and profile/logout at the bottom.
+
 interface SidebarProps {
   currentPage: string;
   onNavigate: (page: string) => void;
@@ -66,8 +78,11 @@ interface SidebarProps {
 
 function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps) {
   const groups = isAdmin ? adminNavGroups : navGroups;
+
   return (
     <div style={{ width: 224, background: C.depth, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", height: "100%", flexShrink: 0 }}>
+
+      {/* Logo area at the top of the sidebar */}
       <div style={{ padding: "20px 18px 16px", borderBottom: `1px solid ${C.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 32, height: 32, borderRadius: 9, background: `linear-gradient(135deg,${C.cyan},${C.purple})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -76,10 +91,13 @@ function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps
           <span style={{ fontWeight: 900, fontSize: 17, background: `linear-gradient(135deg,${C.cyanLt},${C.purple})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>UniConnect</span>
         </div>
       </div>
+
+      {/* Navigation links — loops through each group and renders its items */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 10px" }}>
         {groups.map(group => (
           <div key={group.label} style={{ marginBottom: 20 }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: C.txM, textTransform: "uppercase", letterSpacing: 1.2, padding: "0 8px", marginBottom: 6 }}>{group.label}</p>
+
             {group.items.map(item => {
               const Icon = item.icon;
               const active = currentPage === item.id;
@@ -96,6 +114,8 @@ function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps
           </div>
         ))}
       </div>
+
+      {/* Bottom section — profile link and sign out button */}
       <div style={{ padding: "12px 10px", borderTop: `1px solid ${C.border}` }}>
         {!isAdmin && (
           <button className="sideNavItem" onClick={() => onNavigate("profile")}
@@ -103,6 +123,7 @@ function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps
             <User size={16} /> Profile
           </button>
         )}
+
         <button className="sideNavItem" onClick={() => onNavigate("login")}
           style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderRadius: 8, padding: "9px 10px", color: C.red, cursor: "pointer", fontSize: 13, fontWeight: 500, textAlign: "left", opacity: 0.8 }}>
           <LogOut size={16} /> Sign Out
@@ -112,6 +133,10 @@ function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps
   );
 }
 
+
+// The top bar that sits above every page — shows the current page title,
+// notification/message icons, and the user's avatar with their name.
+
 interface TopBarProps {
   user: UserType;
   currentPage: string;
@@ -119,24 +144,30 @@ interface TopBarProps {
 }
 
 function TopBar({ user, currentPage, onNavigate }: TopBarProps) {
+
+  // Human-friendly labels for each page ID so the top bar shows a nice title
   const pageLabels: Record<string, string> = {
     dashboard: "Dashboard", studyPartners: "Study Partners", studyGroups: "Study Groups",
     resources: "Resources", messages: "Messages", notifications: "Notifications",
     lostFound: "Lost & Found", profile: "Profile", adminDashboard: "Admin Dashboard",
     adminUsers: "Manage Users", adminResources: "Resource Listings", adminReports: "Platform Reports",
   };
+
   return (
     <div style={{ height: 58, background: C.depth, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0 }}>
       <h2 style={{ fontSize: 16, fontWeight: 700, color: C.tx, margin: 0 }}>{pageLabels[currentPage] || "UniConnect"}</h2>
+
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <button onClick={() => onNavigate("notifications")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
           <Bell size={20} />
           <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.red }} />
         </button>
+
         <button onClick={() => onNavigate("messages")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
           <MessageSquare size={20} />
           <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.cyan }} />
         </button>
+
         <button onClick={() => onNavigate("profile")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 8 }}>
           <Avatar name={user.name} size={30} />
           <div style={{ textAlign: "left" }}>
@@ -148,6 +179,10 @@ function TopBar({ user, currentPage, onNavigate }: TopBarProps) {
     </div>
   );
 }
+
+
+// The main layout shell that wraps every authenticated page.
+// It combines the Sidebar + TopBar around whatever page content is passed as children.
 
 interface AppShellProps {
   user: UserType;
@@ -161,8 +196,10 @@ function AppShell({ user, currentPage, onNavigate, isAdmin, children }: AppShell
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <Sidebar currentPage={currentPage} onNavigate={onNavigate} user={user} isAdmin={isAdmin} />
+
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} />
+
         <div style={{ flex: 1, overflowY: "auto", background: C.base }}>
           {children}
         </div>
@@ -171,14 +208,24 @@ function AppShell({ user, currentPage, onNavigate, isAdmin, children }: AppShell
   );
 }
 
+
+// The root App component — this is the brain of the entire application.
+// It manages who's logged in, what page we're on, and routes everything accordingly.
+// It also supports passing navigation data between pages (like opening a specific DM).
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState("login");
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [navData, setNavData] = useState<any>(null);
 
+
+  // Called after a successful login — parses the user data from the API response,
+  // maps it into our internal User type, saves to localStorage, and routes to the right dashboard.
   const handleLogin = (userData: string) => {
     try {
       const user = JSON.parse(userData);
+
       const mappedUser: UserType = {
         userId: user.id || user.userId,
         name: user.name,
@@ -191,7 +238,7 @@ export default function App() {
         role: user.role,
         adminLevel: user.adminLevel || 0,
       };
-      
+
       setCurrentUser(mappedUser);
       localStorage.setItem('uc_user', JSON.stringify(mappedUser));
 
@@ -207,23 +254,35 @@ export default function App() {
     }
   };
 
-  const navigate = (page: string) => {
+
+  // The main navigation function — every page calls this to move around the app.
+  // It also supports an optional second argument for passing data between pages
+  // (like when you click "Message" on a partner, it passes their info to the messages page).
+  // Navigating to "login" clears the session and logs you out.
+  const navigate = (page: string, data?: any) => {
     if (page === "login") {
       setCurrentUser(null);
       setIsAdmin(false);
       localStorage.removeItem('uc_user');
       localStorage.removeItem('uc_token');
     }
+
+    setNavData(data || null);
     setCurrentPage(page);
   };
 
+
+  // On app startup, check if there's a saved session in localStorage.
+  // If there is, restore it so the user doesn't have to log in again every time.
   useEffect(() => {
     const savedUser = localStorage.getItem('uc_user');
     const savedToken = localStorage.getItem('uc_token');
+
     if (savedUser && savedToken) {
       try {
         const user = JSON.parse(savedUser);
         setCurrentUser(user);
+
         if (user.role === 'admin') {
           setIsAdmin(true);
           setCurrentPage("adminDashboard");
@@ -239,29 +298,35 @@ export default function App() {
     }
   }, []);
 
+
+  // Auth pages — these don't need the sidebar/topbar shell, they're full-screen
   if (currentPage === "login") return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
   if (currentPage === "adminLogin") return <AdminLoginPage onNavigate={navigate} onLogin={handleLogin} />;
   if (currentPage === "register") return <RegisterPage onNavigate={navigate} />;
   if (currentPage === "verifyStudent") return <VerifyStudentPage onNavigate={navigate} />;
   if (currentPage === "resetPassword") return <ResetPasswordPage onNavigate={navigate} />;
 
+  // If somehow we get here without a user, kick back to login
   if (!currentUser) return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
 
+  // Main authenticated app — wraps the current page in the shell with sidebar and topbar
   return (
     <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin}>
+
       {currentPage === "dashboard" && <DashboardPage user={currentUser} onNavigate={navigate} />}
-      {currentPage === "profile" && <ProfilePage user={currentUser} onNavigate={navigate} />}
+      {currentPage === "profile" && <ProfilePage user={currentUser} onNavigate={navigate} onUserUpdate={(u: UserType) => { setCurrentUser(u); localStorage.setItem('uc_user', JSON.stringify(u)); }} />}
       {currentPage === "studyPartners" && <StudyPartnersPage onNavigate={navigate} />}
       {currentPage === "studyGroups" && <StudyGroupsPage />}
       {currentPage === "resources" && <ResourcesPage user={currentUser} />}
-      {currentPage === "messages" && <MessagesPage user={currentUser} />}
+      {currentPage === "messages" && <MessagesPage user={currentUser} targetUser={navData?.targetUser} />}
       {currentPage === "notifications" && <NotificationsPage user={currentUser} />}
       {currentPage === "lostFound" && <LostFoundPage user={currentUser} />}
-      
+
       {currentPage === "adminDashboard" && isAdmin && <AdminDashboardPage onNavigate={navigate} />}
       {currentPage === "adminUsers" && isAdmin && <AdminUsersPage user={currentUser} />}
       {currentPage === "adminResources" && isAdmin && <AdminResourcesPage user={currentUser} />}
       {currentPage === "adminReports" && isAdmin && <AdminReportsPage user={currentUser} />}
+
     </AppShell>
   );
 }

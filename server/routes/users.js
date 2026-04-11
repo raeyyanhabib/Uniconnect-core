@@ -1,14 +1,19 @@
 // routes/users.js — Profile & Privacy (UC 4, 6)
+// This file manages everything about a user's profile: viewing it,
+// updating personal info, toggling privacy settings, and fetching dashboard stats.
+
 const express = require('express');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-// All routes here require authentication
+// All routes here require a valid JWT — you must be logged in
 router.use(authMiddleware);
 
-// UC 4 — Get own profile
+
+// UC 4 — Get your own full profile data.
+// Returns everything from name and email to privacy toggles and rating.
 router.get('/me', (req, res) => {
   const user = db.prepare(`
     SELECT id, name, email, department, semester, bio, studentId,
@@ -25,7 +30,9 @@ router.get('/me', (req, res) => {
   res.json(user);
 });
 
-// UC 4 — Update profile (name, bio, department, semester)
+
+// UC 4 — Update your profile info (name, bio, department, semester).
+// Uses COALESCE so you only update the fields you actually send — the rest stay untouched.
 router.put('/me', (req, res) => {
   const { name, bio, department, semester } = req.body;
 
@@ -42,7 +49,9 @@ router.put('/me', (req, res) => {
   res.json(updated);
 });
 
-// UC 6 — Update privacy settings
+
+// UC 6 — Update privacy settings (what others can see on your profile).
+// Converts boolean values to 0/1 integers for SQLite storage.
 router.put('/me/privacy', (req, res) => {
   const { showEmail, showDept, showSemester, showRating, allowRequests, visibility } = req.body;
 
@@ -68,10 +77,12 @@ router.put('/me/privacy', (req, res) => {
   res.json({ message: 'Privacy settings updated' });
 });
 
-// Get real user dashboard stats
+
+// Get real-time dashboard stats for the logged-in user.
+// Counts partners, groups, resources, and active loans from the database.
 router.get('/dashboard', (req, res) => {
   const userId = req.user.id;
-  
+
   const partners = db.prepare(`SELECT count(*) as c FROM PartnerRequests WHERE (fromId = ? OR toId = ?) AND status = 'accepted'`).get(userId, userId).c || 0;
   const groups = db.prepare(`SELECT count(*) as c FROM GroupMembers WHERE userId = ?`).get(userId).c || 0;
   const resources = db.prepare(`SELECT count(*) as c FROM Resources WHERE ownerId = ?`).get(userId).c || 0;
@@ -81,5 +92,6 @@ router.get('/dashboard', (req, res) => {
     stats: { partners, groups, resources, loans }
   });
 });
+
 
 module.exports = router;

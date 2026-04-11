@@ -1,19 +1,26 @@
-// routes/auth.js — Registration, Login, Verify, Reset Password (UC 1–3, 5)
+// routes/auth.js — Registration, Login, Verify, Reset Password, Change Password (UC 1–3, 5)
+// This is the gateway file for all authentication-related operations.
+// Everything from signing up to changing your password lives here.
+
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../db');
-const { SECRET } = require('../middleware/auth');
+const { SECRET, authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Helper: generate a UUID
+
+// Quick UUID generator for creating new user IDs
 function uuid() {
   return crypto.randomUUID();
 }
 
-// UC 1 — Register Account
+
+// UC 1 — Register a brand new account.
+// Takes the student's basic info, hashes their password, and stores everything in the DB.
+// After this, they still need to verify their student status before full access.
 router.post('/register', (req, res) => {
   const { name, email, password, department, semester, studentId } = req.body;
 
@@ -21,7 +28,7 @@ router.post('/register', (req, res) => {
     return res.status(400).json({ error: 'Name, email, and password are required' });
   }
 
-  // Check if email already exists
+  // Make sure nobody else has already registered with this email
   const existing = db.prepare('SELECT id FROM Users WHERE email = ?').get(email);
   if (existing) {
     return res.status(409).json({ error: 'Email already registered' });
@@ -38,12 +45,12 @@ router.post('/register', (req, res) => {
   res.status(201).json({ message: 'Account created. Please verify your student status.', userId: id });
 });
 
-// UC 2 — Verify Student Status
+
+// UC 2 — Verify a student's enrollment status using a 6-digit code.
+// In production this would check against an emailed OTP, but right now any 6-digit code works.
 router.post('/verify', (req, res) => {
   const { userId, code } = req.body;
 
-  // In a real app, you'd check the code against one sent via email
-  // For now, any 6-digit code works
   if (!code || code.length !== 6) {
     return res.status(400).json({ error: 'Invalid verification code' });
   }
@@ -52,7 +59,10 @@ router.post('/verify', (req, res) => {
   res.json({ message: 'Student status verified' });
 });
 
-// UC 3 — Login
+
+// UC 3 — Log in with email and password.
+// Validates credentials, checks if the account is blocked, then issues a JWT token
+// that lasts 7 days so the student stays logged in.
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -92,7 +102,10 @@ router.post('/login', (req, res) => {
   });
 });
 
-// UC 5 — Reset Password
+
+// UC 5 — Request a password reset link.
+// In a real deployment this would fire off an email with a secure token, but
+// for now it just acknowledges the request without revealing if the email exists.
 router.post('/reset-password', (req, res) => {
   const { email } = req.body;
 
@@ -102,13 +115,45 @@ router.post('/reset-password', (req, res) => {
 
   const user = db.prepare('SELECT id FROM Users WHERE email = ?').get(email);
   if (!user) {
-    // Don't reveal whether the email exists
+    // Intentionally vague — don't leak whether the email is in our system
     return res.json({ message: 'If that email exists, a reset link has been sent.' });
   }
 
-  // In a real app, you'd send an email with a reset token
-  // For now, just acknowledge
   res.json({ message: 'If that email exists, a reset link has been sent.' });
 });
+
+
+// Change password — lets a logged-in user update their password.
+// Requires the current password for verification, then hashes and stores the new one.
+// This is the real deal — it actually updates the password in the database.
+router.put('/change-password', authMiddleware, (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Both current and new password are required' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'New password must be at least 8 characters' });
+  }
+
+  // Grab the user's current hash from the database
+  const user = db.prepare('SELECT passwordHash FROM Users WHERE id = ?').get(req.user.id);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  // Verify the current password matches what's stored
+  if (!bcrypt.compareSync(currentPassword, user.passwordHash)) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+
+  // Hash the new password and save it
+  const newHash = bcrypt.hashSync(newPassword, 10);
+  db.prepare('UPDATE Users SET passwordHash = ? WHERE id = ?').run(newHash, req.user.id);
+
+  res.json({ message: 'Password updated successfully' });
+});
+
 
 module.exports = router;
