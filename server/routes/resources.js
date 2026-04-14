@@ -170,10 +170,12 @@ router.post('/transactions/:txId/dispute', (req, res) => {
 // UC 26 — Lending History
 router.get('/history', (req, res) => {
   const history = db.prepare(`
-    SELECT t.*, r.title as resourceTitle, r.category, u.name as borrowerName
+    SELECT t.*, r.title as resourceTitle, r.category, r.ownerId,
+           u.name as borrowerName, owner.name as ownerName
     FROM Transactions t
     JOIN Resources r ON r.id = t.resourceId
     JOIN Users u ON u.id = t.borrowerId
+    JOIN Users owner ON owner.id = r.ownerId
     WHERE r.ownerId = ? OR t.borrowerId = ?
     ORDER BY t.startDate DESC
   `).all(req.user.id, req.user.id);
