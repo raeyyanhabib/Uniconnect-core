@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Users, Package, Layers, Flag, ChevronRight } from 'lucide-react';
 import { C, cardStyle } from '../services/theme';
 import { api } from '../services/api';

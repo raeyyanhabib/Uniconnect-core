@@ -115,7 +115,7 @@ The project utilizes a Mono-repo layout tying a React/Vite front to an Express b
 
 ### Phase 5: System Modernization & App Modularization (Completed)
 - Goal: Modernize frontend architecture. Escape the monolith.
-- Details: Successfully decommissioned the monolithic App.tsx file. Cleanly ripped out components into a modular src/pages/ and src/components/ folder hierarchy to ensure exponential UI maintainability and standard Vite tree-shaking scalability. Integrated the backend source-code safely into the new root.
+- Details: Successfully decommissioned the monolithic App.tsx file. Cleanly ripped out components into a modular src/pages/ and src/components/ folder hierarchy to ensure exponential UI maintainability and standard Vite tree-shaking scalability. Integrated the backend source-code safely into the new root. Also fixed a critical state issue where static mock badge counts were causing false notification red dots, replacing them with dynamic backend polling tied to a responsive `uc_notifications_read` browser event.
 
 ### Phase 6: Core Testing & Socket Architecture (Upcoming)
 - Goal: Ensure the platform is resilient against vulnerabilities and introduce raw latency upgrades.

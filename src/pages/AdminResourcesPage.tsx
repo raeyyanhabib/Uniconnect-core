@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import { C, cardStyle, btnD } from '../services/theme';
 import { api } from '../services/api';

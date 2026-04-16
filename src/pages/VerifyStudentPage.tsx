@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Mail, CheckCircle, RefreshCw } from 'lucide-react';
 import { C, btnP } from '../services/theme';
 import { api } from '../services/api';

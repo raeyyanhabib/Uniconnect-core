@@ -26,4 +26,10 @@ router.put('/:id/read', (req, res) => {
   res.json({ message: 'Notification marked as read' });
 });
 
+// Get unread count
+router.get('/unread-count', (req, res) => {
+  const result = db.prepare('SELECT COUNT(*) as count FROM Notifications WHERE userId = ? AND isRead = 0').get(req.user.id);
+  res.json({ count: result.count || 0 });
+});
+
 module.exports = router;

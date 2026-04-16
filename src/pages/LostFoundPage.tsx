@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Flag, Image, Plus, MapPin, Check, MessageSquare } from 'lucide-react';
 import { C, cardStyle, inp, btnP, btnS, btnG } from '../services/theme';
 import { api } from '../services/api';

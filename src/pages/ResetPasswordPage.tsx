@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { KeyRound, RefreshCw } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';
 import { api } from '../services/api';

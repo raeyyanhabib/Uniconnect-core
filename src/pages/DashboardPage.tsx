@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Package, BookOpen, Layers, UserPlus, CheckCircle, Volume2, RefreshCw } from 'lucide-react';
+import { Users, Layers, Package, BookOpen } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { C } from '../services/theme';
 import { api } from '../services/api';
 import StatCard from '../components/StatCard';
-import type { User, AuthPageProps } from '../types';
 
 
 // Props for the dashboard — takes the logged-in user and a navigation handler
@@ -28,15 +27,6 @@ export default function DashboardPage({ user, onNavigate }: DashboardPageProps) 
       if (data.stats) setStats(data.stats);
     }).catch(console.error);
   }, []);
-
-
-  // Sample recent activity items — these would ideally come from a notifications API
-  const recentActivity = [
-    { icon: UserPlus, text: "Priya Sharma sent you a partner request", time: "2 min ago", color: C.cyan },
-    { icon: CheckCircle, text: "Borrow request for 'Laptop Stand' approved", time: "1 hr ago", color: C.green },
-    { icon: Volume2, text: "New announcement in Algorithms Study Squad", time: "3 hrs ago", color: C.purple },
-    { icon: RefreshCw, text: "James O'Brien returned your book", time: "Yesterday", color: C.amber },
-  ];
 
 
   return (

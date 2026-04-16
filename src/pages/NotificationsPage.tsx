@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Check, UserPlus, Package, Layers, RefreshCw, MessageSquare, Clock } from 'lucide-react';
 import { C, cardStyle, btnS } from '../services/theme';
 import { api } from '../services/api';
@@ -26,6 +26,7 @@ export default function NotificationsPage({ user: _user }: NotificationsPageProp
     try {
       await api.put('/api/notifications/read-all');
       setNotifs(ns => ns.map(n => ({ ...n, isRead: true })));
+      window.dispatchEvent(new CustomEvent('uc_notifications_read'));
     } catch (err) { console.error(err); }
   };
   
@@ -33,6 +34,7 @@ export default function NotificationsPage({ user: _user }: NotificationsPageProp
     try {
       await api.put(`/api/notifications/${id}/read`);
       setNotifs(ns => ns.map(x => x.id === id ? { ...x, isRead: true } : x));
+      window.dispatchEvent(new CustomEvent('uc_notifications_read'));
     } catch (err) { console.error(err); }
   };
 

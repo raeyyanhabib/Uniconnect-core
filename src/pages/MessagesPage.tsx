@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Send } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';
 import { api } from '../services/api';

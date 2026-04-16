@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, UserPlus, Users, Check, X, MessageSquare, UserMinus } from 'lucide-react';
 import { C, cardStyle, inp, btnP, btnG, btnD } from '../services/theme';
 import { api } from '../services/api';
@@ -9,18 +9,15 @@ import SectionHeader from '../components/SectionHeader';
 import Tabs from '../components/Tabs';
 import EmptyState from '../components/EmptyState';
 import StudentCard from '../components/StudentCard';
+import type { User } from '../types';
 
 
 // The Study Partners page — lets students search for new partners, view incoming
 // requests, and manage their existing partner list. The "Message" button on each
 // partner now navigates directly to a DM with that specific person.
 
-interface Student {
-  id: string;
-  name: string;
-  department?: string;
-  status?: string;
-  [key: string]: unknown;
+interface Student extends User {
+  id: string; // The API returns id, we'll map it to userId
 }
 
 interface PartnerRequest {
@@ -32,7 +29,7 @@ interface PartnerRequest {
   avgRating?: number;
 }
 
-export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: string, data?: unknown) => void }) {
+export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: string, data?: any) => void }) {
   const [tab, setTab] = useState("search");
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
@@ -53,9 +50,16 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
           api.get('/api/partners')
         ]);
 
-        setDiscoverableStudents(searchRes);
+        // Map 'id' to 'userId' and ensure status is valid for the User type
+        const mapToUser = (list: any[]): Student[] => list.map(item => ({
+          ...item,
+          userId: item.userId || item.id,
+          status: item.status === 'blocked' ? 'blocked' : 'active'
+        }));
+
+        setDiscoverableStudents(mapToUser(searchRes));
         setIncomingRequests(reqRes);
-        setMyPartners(partRes);
+        setMyPartners(mapToUser(partRes));
       } catch (err) {
         console.error("Failed to load partners data:", err);
       }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, UserCheck, UserX } from 'lucide-react';
 import { C, cardStyle, inp, btnG, btnD } from '../services/theme';
 import { api } from '../services/api';

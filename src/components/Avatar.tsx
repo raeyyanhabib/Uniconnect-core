@@ -1,4 +1,3 @@
-import React from 'react';
 import { C } from '../services/theme';
 
 interface AvatarProps { name?: string; size?: number; }

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Layers, Package, BarChart2, UserCheck, Flag, Settings, HelpCircle, MapPin, Search, BookOpen, MessageSquare, Bell, User, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Users, Layers, Package, BarChart2, UserCheck, Flag, MapPin, BookOpen, MessageSquare, Bell, User, LogOut } from 'lucide-react';
 import { C } from './services/theme';
 import type { User as UserType } from './types';
 import Avatar from './components/Avatar';
+import { api } from './services/api';
 
 // Import Pages
 import LoginPage from './pages/LoginPage';
@@ -36,7 +37,6 @@ interface NavData {
 }
 
 
-// The main navigation links that regular students see on the sidebar
 const navGroups: NavGroup[] = [
   {
     label: "Main",
@@ -50,8 +50,8 @@ const navGroups: NavGroup[] = [
   {
     label: "Connect",
     items: [
-      { id: "messages", label: "Messages", icon: MessageSquare, badge: 2 },
-      { id: "notifications", label: "Notifications", icon: Bell, badge: 3 },
+      { id: "messages", label: "Messages", icon: MessageSquare },
+      { id: "notifications", label: "Notifications", icon: Bell },
       { id: "lostFound", label: "Lost & Found", icon: MapPin },
     ],
   },
@@ -79,9 +79,10 @@ interface SidebarProps {
   onNavigate: (page: string) => void;
   user?: UserType | null;
   isAdmin?: boolean;
+  unreadNotifCount?: number;
 }
 
-function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps) {
+function Sidebar({ currentPage, onNavigate, user: _user, isAdmin, unreadNotifCount = 0 }: SidebarProps) {
   const groups = isAdmin ? adminNavGroups : navGroups;
 
   return (
@@ -112,7 +113,7 @@ function Sidebar({ currentPage, onNavigate, user: _user, isAdmin }: SidebarProps
                   style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: active ? "rgba(14,165,233,0.1)" : "none", border: active ? `none` : "none", borderRight: active ? `2px solid ${C.cyan}` : "2px solid transparent", borderRadius: active ? "8px 0 0 8px" : 8, padding: "9px 10px", color: active ? C.cyanLt : C.txS, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, textAlign: "left" }}>
                   <Icon size={16} />
                   <span style={{ flex: 1 }}>{item.label}</span>
-                  {item.badge && <span style={{ background: C.red, borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>{item.badge}</span>}
+                  {item.id === "notifications" && unreadNotifCount > 0 && <span style={{ background: C.red, borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>{unreadNotifCount}</span>}
                 </button>
               );
             })}
@@ -146,9 +147,10 @@ interface TopBarProps {
   user: UserType;
   currentPage: string;
   onNavigate: (page: string) => void;
+  unreadNotifCount?: number;
 }
 
-function TopBar({ user, currentPage, onNavigate }: TopBarProps) {
+function TopBar({ user, currentPage, onNavigate, unreadNotifCount = 0 }: TopBarProps) {
 
   // Human-friendly labels for each page ID so the top bar shows a nice title
   const pageLabels: Record<string, string> = {
@@ -165,12 +167,11 @@ function TopBar({ user, currentPage, onNavigate }: TopBarProps) {
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <button onClick={() => onNavigate("notifications")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
           <Bell size={20} />
-          <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.red }} />
+          {unreadNotifCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.red }} />}
         </button>
 
         <button onClick={() => onNavigate("messages")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
           <MessageSquare size={20} />
-          <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.cyan }} />
         </button>
 
         <button onClick={() => onNavigate("profile")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 8 }}>
@@ -194,16 +195,17 @@ interface AppShellProps {
   currentPage: string;
   onNavigate: (page: string) => void;
   isAdmin?: boolean;
+  unreadNotifCount?: number;
   children: React.ReactNode;
 }
 
-function AppShell({ user, currentPage, onNavigate, isAdmin, children }: AppShellProps) {
+function AppShell({ user, currentPage, onNavigate, isAdmin, unreadNotifCount, children }: AppShellProps) {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <Sidebar currentPage={currentPage} onNavigate={onNavigate} user={user} isAdmin={isAdmin} />
+      <Sidebar currentPage={currentPage} onNavigate={onNavigate} user={user} isAdmin={isAdmin} unreadNotifCount={unreadNotifCount} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} />
+        <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} unreadNotifCount={unreadNotifCount} />
 
         <div style={{ flex: 1, overflowY: "auto", background: C.base }}>
           {children}
@@ -223,6 +225,26 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [navData, setNavData] = useState<NavData | null>(null);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser) { setUnreadNotifCount(0); return; }
+
+    const fetchCount = async () => {
+      try {
+        const res = await api.get('/api/notifications/unread-count');
+        setUnreadNotifCount(res.count || 0);
+      } catch { /* ignore when not authenticated */ }
+    };
+
+    fetchCount();
+    const interval = setInterval(fetchCount, 5000);
+    window.addEventListener('uc_notifications_read', fetchCount);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('uc_notifications_read', fetchCount);
+    };
+  }, [currentUser]);
 
 
   // Called after a successful login — parses the user data from the API response,
@@ -316,7 +338,7 @@ export default function App() {
 
   // Main authenticated app — wraps the current page in the shell with sidebar and topbar
   return (
-    <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin}>
+    <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin} unreadNotifCount={unreadNotifCount}>
 
       {currentPage === "dashboard" && <DashboardPage user={currentUser} onNavigate={navigate} />}
       {currentPage === "profile" && <ProfilePage user={currentUser} onNavigate={navigate} onUserUpdate={(u: UserType) => { setCurrentUser(u); localStorage.setItem('uc_user', JSON.stringify(u)); }} />}
