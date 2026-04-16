@@ -30,6 +30,11 @@ import AdminReportsPage from './pages/AdminReportsPage';
 interface NavItem { id: string; label: string; icon: React.ElementType; badge?: number; }
 interface NavGroup { label: string; items: NavItem[]; }
 
+interface NavData {
+  targetUser?: { id: string; name: string };
+  [key: string]: unknown;
+}
+
 
 // The main navigation links that regular students see on the sidebar
 const navGroups: NavGroup[] = [
@@ -217,7 +222,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("login");
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [navData, setNavData] = useState<any>(null);
+  const [navData, setNavData] = useState<NavData | null>(null);
 
 
   // Called after a successful login — parses the user data from the API response,
@@ -259,7 +264,7 @@ export default function App() {
   // It also supports an optional second argument for passing data between pages
   // (like when you click "Message" on a partner, it passes their info to the messages page).
   // Navigating to "login" clears the session and logs you out.
-  const navigate = (page: string, data?: any) => {
+  const navigate = (page: string, data?: NavData) => {
     if (page === "login") {
       setCurrentUser(null);
       setIsAdmin(false);

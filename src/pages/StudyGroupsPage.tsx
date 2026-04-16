@@ -14,8 +14,6 @@ export default function StudyGroupsPage() {
   const [tab, setTab] = useState("myGroups");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [detailedGroup, setDetailedGroup] = useState<any>(null);
-  
-  const [_showCreate, _setShowCreate] = useState(false);
   const [newGroup, setNewGroup] = useState({ name: "", desc: "", course: "", max: "8", visibility: "public" });
   const [newAnnouncement, setNewAnnouncement] = useState("");
 
@@ -39,13 +37,15 @@ export default function StudyGroupsPage() {
   }, [tab]);
 
   useEffect(() => {
+    let isMounted = true;
     if (selectedGroup) {
       api.get(`/api/groups/${selectedGroup}`)
-        .then(setDetailedGroup)
+        .then(data => {
+          if (isMounted) setDetailedGroup(data);
+        })
         .catch(console.error);
-    } else {
-      setDetailedGroup(null);
     }
+    return () => { isMounted = false; };
   }, [selectedGroup]);
 
   const handleJoin = async (id: string) => {
@@ -129,7 +129,7 @@ export default function StudyGroupsPage() {
               <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tx, margin: 0 }}>Members ({grp.members?.length || 0})</h3>
               {grp.isCreator === 1 && <button style={{ ...btnS, padding: "5px 10px", fontSize: 11 }}><UserPlus size={13} /> Invite</button>}
             </div>
-            {grp.members?.map((m: any) => (
+            {grp.members?.map((m: { id: string; name: string; department: string }) => (
               <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${C.border}` }}>
                 <Avatar name={m.name} size={32} />
                 <div style={{ flex: 1 }}>
@@ -153,7 +153,7 @@ export default function StudyGroupsPage() {
             )}
             {(grp.announcements?.length ?? 0) === 0
               ? <EmptyState icon={Volume2} title="No announcements yet" />
-              : grp.announcements?.map((a: any) => (
+              : grp.announcements?.map((a: { id: string; content: string; authorName: string; createdAt: string }) => (
                   <div key={a.id} style={{ padding: "12px 14px", background: C.surface, borderRadius: 10, border: `1px solid ${C.border}`, marginBottom: 10 }}>
                     <p style={{ fontSize: 13, color: C.tx, margin: "0 0 6px", lineHeight: 1.5 }}>{a.content}</p>
                     <p style={{ fontSize: 11, color: C.txM, margin: 0 }}>{a.authorName} · {new Date(a.createdAt).toLocaleDateString()}</p>

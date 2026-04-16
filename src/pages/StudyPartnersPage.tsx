@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Users, Check, X, MessageSquare, UserMinus } from 'lucide-react';
-import { C, cardStyle, inp, btnP, btnS, btnG, btnD } from '../services/theme';
+import { C, cardStyle, inp, btnP, btnG, btnD } from '../services/theme';
 import { api } from '../services/api';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
@@ -15,14 +15,31 @@ import StudentCard from '../components/StudentCard';
 // requests, and manage their existing partner list. The "Message" button on each
 // partner now navigates directly to a DM with that specific person.
 
-export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: string, data?: any) => void }) {
+interface Student {
+  id: string;
+  name: string;
+  department?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
+interface PartnerRequest {
+  id: string;
+  fromName: string;
+  fromDept?: string;
+  fromSemester?: number;
+  createdAt: string;
+  avgRating?: number;
+}
+
+export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: string, data?: unknown) => void }) {
   const [tab, setTab] = useState("search");
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
 
-  const [discoverableStudents, setDiscoverableStudents] = useState<any[]>([]);
-  const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
-  const [myPartners, setMyPartners] = useState<any[]>([]);
+  const [discoverableStudents, setDiscoverableStudents] = useState<Student[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<PartnerRequest[]>([]);
+  const [myPartners, setMyPartners] = useState<Student[]>([]);
 
 
   // Load all three data sets (search results, pending requests, current partners)
@@ -53,8 +70,8 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
     try {
       await api.post('/api/partners/requests', { toId: userId });
       alert("Partner request sent!");
-    } catch (err: any) {
-      alert("Error: " + err.message);
+    } catch (err) {
+      alert("Error: " + (err instanceof Error ? err.message : String(err)));
     }
   };
 

@@ -40,6 +40,21 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// Fallback 404 Route Not Found Handler
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Endpoint not found or method not supported' });
+});
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+  console.error("[Global Error]:", err);
+  const status = err.status || 500;
+  res.status(status).json({
+    error: 'Internal server error occurred',
+    details: err.message || 'Unknown error'
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`UniConnect server running on http://localhost:${PORT}`);
