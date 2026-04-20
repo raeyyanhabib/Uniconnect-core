@@ -16,7 +16,6 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
   // Handles the actual login — sends credentials to the API,
   // stores the JWT token, and passes the user data up to the App.
   // The 'role' parameter lets us distinguish between student and admin logins.
@@ -84,7 +83,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
             </div>
           </FormField>
 
-          <button onClick={() => onNavigate("resetPassword")} style={{ background: "none", border: "none", color: C.cyan, fontSize: 13, cursor: "pointer", padding: 0, marginBottom: 10 }}>
+          <button type="button" onClick={() => onNavigate("resetPassword")} style={{ background: "none", border: "none", color: C.cyan, fontSize: 13, cursor: "pointer", padding: 0, marginBottom: 10 }}>
             Forgot password?
           </button>
 
@@ -101,7 +100,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
           {/* Registration link */}
           <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 24, paddingTop: 20, textAlign: "center" }}>
             <span style={{ color: C.txM, fontSize: 13 }}>Don't have an account? </span>
-            <button onClick={() => onNavigate("register")} style={{ background: "none", border: "none", color: C.cyan, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Register here</button>
+            <button type="button" onClick={() => onNavigate("register")} style={{ background: "none", border: "none", color: C.cyan, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Register here</button>
           </div>
         </form>
       </div>

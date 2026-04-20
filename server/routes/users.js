@@ -83,7 +83,7 @@ router.put('/me/privacy', (req, res) => {
 router.get('/dashboard', (req, res) => {
   const userId = req.user.id;
 
-  const partners = db.prepare(`SELECT count(*) as c FROM PartnerRequests WHERE (fromId = ? OR toId = ?) AND status = 'accepted'`).get(userId, userId).c || 0;
+  const partners = db.prepare(`SELECT count(DISTINCT CASE WHEN fromId = ? THEN toId ELSE fromId END) as c FROM PartnerRequests WHERE (fromId = ? OR toId = ?) AND status = 'accepted'`).get(userId, userId, userId).c || 0;
   const groups = db.prepare(`SELECT count(*) as c FROM GroupMembers WHERE userId = ?`).get(userId).c || 0;
   const resources = db.prepare(`SELECT count(*) as c FROM Resources WHERE ownerId = ?`).get(userId).c || 0;
   const loans = db.prepare(`SELECT count(*) as c FROM Transactions WHERE borrowerId = ? AND status = 'active'`).get(userId).c || 0;

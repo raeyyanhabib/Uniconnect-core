@@ -48,7 +48,6 @@ for (const s of students) {
     insertUser.run(sId, s.name, s.email, pass, "Computer Science", 4, "student", s.studentId);
     // Request accepted from Raeyyan's side to others
     insertPartner.run(uuid(), raeyyanId, sId, "accepted");
-    insertPartner.run(uuid(), sId, raeyyanId, "accepted");
   }
 }
 
