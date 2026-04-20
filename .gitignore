@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (contain secrets)
+server/.env
+.env
+.env.local
+.env.*.local
+
+# SQLite database files (runtime artifacts)
+*.db
+*.db-shm
+*.db-wal

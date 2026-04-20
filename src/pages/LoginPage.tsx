@@ -11,8 +11,8 @@ import type { AuthPageProps } from '../types';
 // registration, and password reset. Enter key is fully supported.
 
 export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
-  const [email, setEmail] = useState("alex.chen@university.edu");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,15 +26,9 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
     setError("");
 
     try {
-      if (role === "admin") {
-        const data = await api.post('/api/auth/login', { email: 'admin@university.edu', password: 'admin123' });
-        setToken(data.token);
-        onLogin?.(JSON.stringify({ ...data.user, role: 'admin' }));
-      } else {
-        const data = await api.post('/api/auth/login', { email, password });
-        setToken(data.token);
-        onLogin?.(JSON.stringify(data.user));
-      }
+      const data = await api.post('/api/auth/login', { email, password });
+      setToken(data.token);
+      onLogin?.(JSON.stringify(data.user));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

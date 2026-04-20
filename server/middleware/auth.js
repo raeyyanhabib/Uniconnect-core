@@ -1,6 +1,12 @@
 // middleware/auth.js — JWT verification middleware
 const jwt = require('jsonwebtoken');
-const SECRET = process.env.JWT_SECRET || 'uniconnect-dev-secret';
+
+// Require a proper secret — never fall back to a hardcoded value
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET is not set. Create a server/.env file from .env.example.');
+  process.exit(1);
+}
+const SECRET = process.env.JWT_SECRET;
 
 // Verifies the Authorization header and attaches user info to req.user
 function authMiddleware(req, res, next) {
