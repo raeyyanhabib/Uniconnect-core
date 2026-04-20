@@ -167,7 +167,11 @@ function TopBar({ user, currentPage, onNavigate, unreadNotifCount = 0 }: TopBarP
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <button onClick={() => onNavigate("notifications")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
           <Bell size={20} />
-          {unreadNotifCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: C.red }} />}
+          {unreadNotifCount > 0 && (
+            <span style={{ position: "absolute", top: -4, right: -4, background: C.red, color: "#fff", borderRadius: "50%", padding: "2px 5px", fontSize: 10, fontWeight: 700 }}>
+              {unreadNotifCount}
+            </span>
+          )}
         </button>
 
         <button onClick={() => onNavigate("messages")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
