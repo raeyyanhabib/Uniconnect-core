@@ -28,6 +28,13 @@ router.post('/register', (req, res) => {
     return res.status(400).json({ error: 'Name, email, and password are required' });
   }
 
+  // Enforce FAST-NU email format on the server side too — the frontend checks
+  // this but anyone with curl can skip it, so we validate here as well
+  const emailRegex = /^[a-zA-Z]\d{2}\d{4}@(lhr|isb|fsd|khi|pwr)\.nu\.edu\.pk$/i;
+  if (!emailRegex.test(email.trim())) {
+    return res.status(400).json({ error: 'Only FAST-NU university emails are allowed (e.g. l240690@lhr.nu.edu.pk)' });
+  }
+
   // Make sure nobody else has already registered with this email
   const existing = db.prepare('SELECT id FROM Users WHERE email = ?').get(email);
   if (existing) {
