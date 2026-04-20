@@ -32,6 +32,11 @@ async function request(method: string, path: string, body?: unknown) {
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
+    if ((res.status === 401 || res.status === 403) && !path.includes('/auth/')) {
+      localStorage.removeItem('uc_token');
+      localStorage.removeItem('uc_user');
+      window.location.reload();
+    }
     throw new Error(data.error || `Request failed (${res.status})`);
   }
 

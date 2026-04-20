@@ -30,6 +30,6 @@ Acting directly alongside Raeyyan, Abdulrehman shouldered the second-largest por
 The remaining vital sectors of the project—spanning across QA, user flow testing, component structuring, and UI polishing—were divided efficiently and equally among the rest of the crew:
 - **Hassan Rizwan (24L-0891)**: Championed the integration of the resource market modules and engineered the state-of-the-art University News communication portal within the dashboard layout.
 - **Hassaan Faisal (24L-0884)**: Commanded the Lost & Found endpoints, bringing structural integrity to the notification streams and optimizing interactive component workflows.
-- **Muaz Afzam Khan (24L-0740)**: Led the charge on study group features, tackling dynamic rendering mechanisms across the UI, and developing the dedicated "Add News" publishing flow.
+- **Muaz Afzal Khan (24L-0740)**: Led the charge on study group features, tackling dynamic rendering mechanisms across the UI, and developing the dedicated "Add News" publishing flow.
 
 Together, these five components form the bloodline of UniConnect. A project born out of necessity, crafted with precision, and maintained as a testament to solid teamwork.

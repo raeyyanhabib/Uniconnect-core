@@ -8,8 +8,7 @@ import type { AuthPageProps } from '../types';
 
 // The login page — the first thing users see when they open UniConnect.
 // Handles student login via email/password, with links to admin portal,
-// registration, and password reset. Enter key is fully supported.
-
+// registration, and password reset. 
 export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
   const [email, setEmail] = useState("l241234@lhr.nu.edu.pk");
   const [password, setPassword] = useState("12345678");
@@ -36,14 +35,13 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
     }
   };
 
-
-  // Let the user press Enter to submit the form instead of clicking the button
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !loading) {
+  // Let the browser handle form submission when user clicks Sign In or presses Enter
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loading) {
       handleLogin("student");
     }
   };
-
 
   return (
     <div style={{ height: "100vh", background: C.base, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -65,22 +63,22 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
         </div>
 
         {/* Login form card */}
-        <div className="authCard" style={{ padding: 32 }}>
+        <form className="authCard" style={{ padding: 32 }} onSubmit={handleSubmit}>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tx, marginTop: 0, marginBottom: 4 }}>Welcome back</h2>
           <p style={{ color: C.txM, fontSize: 13, marginBottom: 24 }}>Sign in with your university email</p>
 
           <FormField label="University Email">
             <div style={{ position: "relative" }}>
               <Mail size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: C.txM }} />
-              <input style={{ ...inp, paddingLeft: 36 }} value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} placeholder="you@university.edu" />
+              <input type="email" name="email" id="email" autoComplete="email" style={{ ...inp, paddingLeft: 36 }} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@university.edu" />
             </div>
           </FormField>
 
           <FormField label="Password">
             <div style={{ position: "relative" }}>
               <Lock size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: C.txM }} />
-              <input type={showPw ? "text" : "password"} style={{ ...inp, paddingLeft: 36, paddingRight: 40 }} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} placeholder="••••••••" />
-              <button onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.txM, cursor: "pointer" }}>
+              <input type={showPw ? "text" : "password"} name="password" id="password" autoComplete="current-password" style={{ ...inp, paddingLeft: 36, paddingRight: 40 }} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" />
+              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.txM, cursor: "pointer" }}>
                 <Eye size={16} />
               </button>
             </div>
@@ -92,11 +90,11 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
 
           {error && <div style={{ background: "rgba(239,68,68,0.12)", border: `1px solid rgba(239,68,68,0.3)`, borderRadius: 8, padding: "8px 12px", marginBottom: 12, color: C.red, fontSize: 13 }}>{error}</div>}
 
-          <button onClick={() => handleLogin("student")} style={{ ...btnP, width: "100%", justifyContent: "center", marginBottom: 12, opacity: loading ? 0.7 : 1 }} disabled={loading}>
+          <button type="submit" style={{ ...btnP, width: "100%", justifyContent: "center", marginBottom: 12, opacity: loading ? 0.7 : 1 }} disabled={loading}>
             {loading ? <RefreshCw size={16} className="spin" /> : <><Check size={16} /> Sign In</>}
           </button>
 
-          <button onClick={() => onNavigate("adminLogin")} style={{ ...btnS, width: "100%", justifyContent: "center", fontSize: 13 }}>
+          <button type="button" onClick={() => onNavigate("adminLogin")} style={{ ...btnS, width: "100%", justifyContent: "center", fontSize: 13 }}>
             <Shield size={14} /> Admin Portal
           </button>
 
@@ -105,7 +103,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
             <span style={{ color: C.txM, fontSize: 13 }}>Don't have an account? </span>
             <button onClick={() => onNavigate("register")} style={{ background: "none", border: "none", color: C.cyan, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Register here</button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
