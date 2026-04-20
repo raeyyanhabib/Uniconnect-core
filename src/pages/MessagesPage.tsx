@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Send } from 'lucide-react';
+import { Search, Send, MessageSquare } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';
 import { api } from '../services/api';
 import Avatar from '../components/Avatar';
@@ -66,9 +66,7 @@ export default function MessagesPage({ user: _user, targetUser }: MessagesPagePr
           return newCs;
         });
 
-        if (res.length > 0 && !activeConv && !newTarget) {
-          setActiveConv(res[0].id);
-        }
+        // Removed auto-select so it defaults to empty state
       } catch (err) { console.error(err); }
     };
 
@@ -229,6 +227,16 @@ export default function MessagesPage({ user: _user, targetUser }: MessagesPagePr
               </button>
             </div>
           </>
+        )}
+        
+        {!currentConvo && !newTarget && (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center" }}>
+            <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(139,92,246,0.05)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <MessageSquare size={32} color={C.purple} />
+            </div>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tx, margin: "0 0 10px 0" }}>Your Messages</h2>
+            <p style={{ color: C.txM, fontSize: 13, maxWidth: 300, lineHeight: 1.5 }}>Select a conversation from the sidebar or start a new chat with a suggested study partner.</p>
+          </div>
         )}
       </div>
     </div>

@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# 🚀 sda-uniconnect
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Yo, welcome to **sda-uniconnect**! 🎉 This is the central hub where everything comes together. Grab a coffee, stretch those fingers, and let's dive into what makes this project tick.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What's the Vibe? 
 
-## React Compiler
+UniConnect is an all-in-one campus collaboration platform. It's built to tackle the chaos of university life — connecting you with study partners, tracking down your lost stuff, swapping resources, and keeping your groups organized. Basically, it’s the wingman you always needed for survival mode during finals week. 
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+We kept the vibes clean and formal, but with enough punch to keep it interesting. Fast frontend, solid backend, you know the deal. 
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack 🛠
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+We aren't messing around out here. Here’s the sauce:
+- **Frontend:** React (powered by Vite, because nobody likes waiting)
+- **Styling:** Vanilla CSS & Tailwind (keeping it crispy)
+- **Icons:** Lucide React
+- **Backend:** Node.js + Express (serving the good stuff)
+- **Database:** SQLite with `better-sqlite3` (lightweight, blazing fast)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Where's the Rest of the Docs? 📚
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+If you want the deep lore, check out the `docs/` folder:
+- Grab the popcorn and read the [Bloodline Doc](docs/bloodline.md) to see who did what, the history, and how we split the heavy lifting.
+- Setting passwords or getting lost in Git? Follow the [Tutorial](docs/tutorial.md) to get your local environment running smoother than butter.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Stay connected, and happy coding! ✌️

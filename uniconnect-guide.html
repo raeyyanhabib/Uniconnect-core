@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect — Complete Technical Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0B1120;
+      --bg2: #0F172A;
+      --surface: #1E293B;
+      --card: #1E293B;
+      --border: rgba(255,255,255,0.08);
+      --border-lt: rgba(255,255,255,0.12);
+      --cyan: #3B82F6;
+      --cyan-lt: #60A5FA;
+      --cyan-dk: #2563EB;
+      --amber: #F59E0B;
+      --green: #10B981;
+      --red: #EF4444;
+      --purple: #6366F1;
+      --pink: #EC4899;
+      --tx: #F8FAFC;
+      --tx-s: #CBD5E1;
+      --tx-m: #94A3B8;
+      --radius: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 4px; }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 60vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 70%, rgba(99,102,241,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 40px; padding: 6px 18px 6px 8px;
+      font-size: 12px; font-weight: 600; color: var(--cyan-lt);
+      margin-bottom: 28px; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 62px); font-weight: 900;
+      background: linear-gradient(135deg, var(--cyan-lt), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 16px; line-height: 1.15;
+    }
+    .hero p { font-size: 18px; color: var(--tx-m); max-width: 620px; }
+
+    /* ── Layout ── */
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Table of Contents ── */
+    .toc {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px 40px;
+      margin-bottom: 60px;
+    }
+    .toc h2 {
+      font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--tx-m); margin-bottom: 20px;
+    }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; }
+    .toc a {
+      color: var(--tx-s); text-decoration: none; font-size: 14px; font-weight: 500;
+      padding: 8px 0; display: flex; align-items: center; gap: 10px;
+      transition: color 0.2s;
+    }
+    .toc a:hover { color: var(--cyan-lt); }
+    .toc a .num {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+      color: var(--cyan); background: rgba(59,130,246,0.1); border-radius: 6px;
+      padding: 2px 7px;
+    }
+
+    /* ── Section ── */
+    section { margin-bottom: 72px; }
+    section > h2 {
+      font-size: 28px; font-weight: 800; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    section > h2 .tag {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      background: rgba(59,130,246,0.12); color: var(--cyan-lt); border-radius: 6px;
+      padding: 3px 10px;
+    }
+    section > .subtitle { color: var(--tx-m); font-size: 15px; margin-bottom: 32px; }
+
+    /* ── Tech Cards ── */
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .tech-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px; transition: border-color 0.3s, transform 0.2s;
+    }
+    .tech-card:hover { border-color: var(--border-lt); transform: translateY(-2px); }
+    .tech-card .icon-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    }
+    .tech-card .icon-box {
+      width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; flex-shrink: 0;
+    }
+    .tech-card h3 { font-size: 17px; font-weight: 700; }
+    .tech-card .role {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--tx-m); margin-top: 2px;
+    }
+    .tech-card p { font-size: 14px; color: var(--tx-s); line-height: 1.7; }
+    .tech-card .why {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--tx-m);
+    }
+    .tech-card .why strong { color: var(--cyan-lt); }
+
+    /* ── File Tree ── */
+    .file-section { margin-bottom: 40px; }
+    .file-section h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 14px;
+      padding-left: 14px; border-left: 3px solid var(--cyan);
+    }
+    .file-list { display: flex; flex-direction: column; gap: 12px; }
+    .file-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; transition: border-color 0.3s;
+    }
+    .file-item:hover { border-color: var(--border-lt); }
+    .file-item .file-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;
+    }
+    .file-item .filename {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+      color: var(--cyan-lt);
+    }
+    .file-item .file-tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+      padding: 2px 8px; border-radius: 5px;
+    }
+    .tag-page { background: rgba(99,102,241,0.12); color: var(--purple); }
+    .tag-component { background: rgba(16,185,129,0.12); color: var(--green); }
+    .tag-service { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .tag-config { background: rgba(236,72,153,0.12); color: var(--pink); }
+    .tag-route { background: rgba(59,130,246,0.12); color: var(--cyan); }
+    .tag-middleware { background: rgba(239,68,68,0.12); color: var(--red); }
+    .tag-data { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .tag-style { background: rgba(236,72,153,0.12); color: var(--pink); }
+
+    .file-item p { font-size: 13px; color: var(--tx-s); line-height: 1.65; }
+    .file-item code {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      background: rgba(59,130,246,0.08); color: var(--cyan-lt);
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ── Dependency Table ── */
+    .dep-table-wrap {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 24px;
+    }
+    .dep-table-wrap h4 {
+      font-size: 14px; font-weight: 700; padding: 16px 24px; background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--tx-m); padding: 12px 24px;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 24px; font-size: 13.5px; color: var(--tx-s);
+      border-bottom: 1px solid var(--border);
+    }
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--cyan-lt); font-weight: 500;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Diagram ── */
+    .diagram-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px; margin-bottom: 32px; text-align: center;
+    }
+    .diagram-card h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--tx-m); margin-bottom: 24px; }
+    .flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+    .flow-node {
+      padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: var(--tx-m); font-size: 20px; padding: 0 8px; }
+    .fn-browser { background: rgba(99,102,241,0.15); color: var(--purple); border: 1px solid rgba(99,102,241,0.25); }
+    .fn-vite { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+    .fn-react { background: rgba(59,130,246,0.15); color: var(--cyan-lt); border: 1px solid rgba(59,130,246,0.25); }
+    .fn-proxy { background: rgba(236,72,153,0.15); color: var(--pink); border: 1px solid rgba(236,72,153,0.25); }
+    .fn-express { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+    .fn-sqlite { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+
+    /* ── Schema Cards ── */
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .schema-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .schema-card h4 {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+      color: var(--amber); margin-bottom: 10px;
+    }
+    .schema-card ul { list-style: none; }
+    .schema-card li {
+      font-size: 12.5px; color: var(--tx-s); padding: 3px 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .schema-card li .col-name { color: var(--cyan-lt); }
+    .schema-card li .col-type { color: var(--tx-m); }
+
+    /* ── Callout ── */
+    .callout {
+      border-radius: 14px; padding: 20px 24px; margin-bottom: 28px;
+      display: flex; align-items: flex-start; gap: 14px;
+      font-size: 14px; line-height: 1.65;
+    }
+    .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .callout-blue { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18); color: var(--tx-s); }
+    .callout-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.18); color: var(--tx-s); }
+    .callout-amber { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.18); color: var(--tx-s); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 24px; text-align: center; border-top: 1px solid var(--border);
+      color: var(--tx-m); font-size: 13px; margin-top: 40px;
+    }
+    footer span { color: var(--cyan-lt); font-weight: 600; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .tech-grid, .toc-grid, .schema-grid { grid-template-columns: 1fr; }
+      .flow { flex-direction: column; gap: 6px; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<header class="hero">
+  <div class="hero-badge"><span class="dot"></span> Technical Reference Guide</div>
+  <h1>UniConnect</h1>
+  <p>A complete, line-by-line technical breakdown of every technology, file, and dependency powering the UniConnect campus platform.</p>
+</header>
+
+<div class="container">
+
+<!-- ═══════════════════════ TOC ═══════════════════════ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#tech"><span class="num">01</span> The Technology Stack</a>
+    <a href="#how"><span class="num">02</span> How It All Connects</a>
+    <a href="#frontend-files"><span class="num">03</span> Frontend Files Breakdown</a>
+    <a href="#backend-files"><span class="num">04</span> Backend Files Breakdown</a>
+    <a href="#database"><span class="num">05</span> The Database Schema</a>
+    <a href="#config"><span class="num">06</span> Configuration Files</a>
+    <a href="#deps"><span class="num">07</span> Every Single Dependency</a>
+    <a href="#glossary"><span class="num">08</span> Glossary of Terms</a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════ SECTION 1: TECH STACK ═══════════════════════ -->
+<section id="tech">
+  <h2>The Technology Stack <span class="tag">Fundamentals</span></h2>
+  <p class="subtitle">Every tool, language, and framework used in UniConnect — what it is, what it does, and why we chose it.</p>
+
+  <div class="tech-grid">
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(59,130,246,0.15);color:var(--cyan);">⚛</div>
+        <div><h3>React</h3><div class="role">UI Library</div></div>
+      </div>
+      <p>React is a JavaScript library created by Facebook for building user interfaces. Instead of reloading entire pages, React builds your app out of small, reusable "components" — self-contained blocks of UI (like a button, a card, or an entire page). When data changes, React automatically figures out the minimum number of updates needed and re-renders only the affected parts. This makes apps feel instant and responsive.</p>
+      <div class="why"><strong>Why we use it:</strong> It lets us build a complex 17-page app from modular pieces. Each page is a separate file, each button a reusable component.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(99,102,241,0.15);color:var(--purple);">TS</div>
+        <div><h3>TypeScript</h3><div class="role">Language</div></div>
+      </div>
+      <p>TypeScript is JavaScript with types. In plain JavaScript, a variable can hold anything — a number, a string, an object — and the language won't warn you if something is wrong until the code actually runs and crashes. TypeScript adds a layer where you define what shape your data should have (e.g., "a User always has a name and an email"). If you make a mistake, the editor catches it instantly before you even run the code.</p>
+      <div class="why"><strong>Why we use it:</strong> With 30+ files exchanging data, TypeScript prevents bugs by ensuring every component knows exactly what data it will receive.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(245,158,11,0.15);color:var(--amber);">⚡</div>
+        <div><h3>Vite</h3><div class="role">Build Tool & Dev Server</div></div>
+      </div>
+      <p>Vite (French for "fast") is the tool that runs your React project during development. When you type <code>npm run dev</code>, Vite starts a local web server, watches your files, and instantly refreshes the browser when you save a change — a feature called Hot Module Replacement (HMR). For production, Vite bundles all your files into optimized, minified assets. Think of it as the engine that converts your source code into something a browser can actually understand.</p>
+      <div class="why"><strong>Why we use it:</strong> It's the fastest dev server available. Changes reflect in under 100ms. The older alternative (Create React App) could take 10-30 seconds.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(16,185,129,0.15);color:var(--green);">Ex</div>
+        <div><h3>Express.js</h3><div class="role">Backend Framework</div></div>
+      </div>
+      <p>Express is a minimal Node.js framework for building web servers. It handles incoming HTTP requests (GET, POST, PUT, DELETE) and routes them to the right handler function. When the React frontend needs data — like "fetch all study groups" — it sends a request to the Express server, which queries the database, processes the result, and sends back JSON data. Express is the bridge between the UI and the database.</p>
+      <div class="why"><strong>Why we use it:</strong> It's the most battle-tested Node.js server framework in existence. Simple to learn, powerful enough for production.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(239,68,68,0.15);color:var(--red);">🗄</div>
+        <div><h3>SQLite</h3><div class="role">Database</div></div>
+      </div>
+      <p>SQLite is a relational database that stores all its data in a single file on disk (<code>uniconnect.db</code>). Unlike MySQL or PostgreSQL which require running a separate server process, SQLite runs directly inside your Node.js application. It supports full SQL — tables, joins, foreign keys, indexes — but with zero configuration. You literally just point it at a file and start querying. It's used in billions of devices worldwide (every iPhone has SQLite).</p>
+      <div class="why"><strong>Why we use it:</strong> Zero setup. No database server to install. Perfect for a university project that needs to be portable and easy to demo.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(236,72,153,0.15);color:var(--pink);">🌐</div>
+        <div><h3>Node.js</h3><div class="role">Runtime Environment</div></div>
+      </div>
+      <p>Node.js lets you run JavaScript outside of a web browser. Normally, JavaScript only works inside Chrome, Firefox, etc. Node.js took Chrome's V8 engine and packaged it as a standalone program, so you can use JavaScript to build servers, command-line tools, and more. Our Express backend runs on Node.js. When you type <code>npm start</code>, you're telling Node.js to execute the server code.</p>
+      <div class="why"><strong>Why we use it:</strong> One language (JavaScript/TypeScript) for both frontend AND backend. No context-switching between languages.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(59,130,246,0.15);color:var(--cyan);">🔑</div>
+        <div><h3>JWT (JSON Web Tokens)</h3><div class="role">Authentication System</div></div>
+      </div>
+      <p>JWT is how we handle login sessions. When a user logs in, the server creates a signed token — an encoded string containing the user's ID and role. This token is sent back to the browser and stored in <code>localStorage</code>. Every subsequent API request includes this token in the headers. The server decodes it to identify who's making the request, without needing to store session data. If the token is tampered with, the signature check fails and access is denied.</p>
+      <div class="why"><strong>Why we use it:</strong> Stateless authentication. The server doesn't need to remember who's logged in — the token itself contains all necessary info.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(16,185,129,0.15);color:var(--green);">📦</div>
+        <div><h3>npm (Node Package Manager)</h3><div class="role">Package Manager</div></div>
+      </div>
+      <p>npm is the tool that manages external libraries (called "packages" or "dependencies"). Instead of writing everything from scratch, you install pre-built solutions — like <code>bcryptjs</code> for password hashing. The <code>package.json</code> file lists every dependency, and <code>npm install</code> downloads them all into a <code>node_modules</code> folder. Think of npm as an app store for code libraries.</p>
+      <div class="why"><strong>Why we use it:</strong> It comes with Node.js by default and hosts over 2 million packages. Every JavaScript project uses it.</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 2: HOW IT CONNECTS ═══════════════════════ -->
+<section id="how">
+  <h2>How It All Connects <span class="tag">Architecture</span></h2>
+  <p class="subtitle">The complete request lifecycle — from clicking a button in the browser to data arriving from the database.</p>
+
+  <div class="diagram-card">
+    <h4>Request Flow</h4>
+    <div class="flow">
+      <div class="flow-node fn-browser">🖥 Browser</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-vite">⚡ Vite Dev Server<br><small>localhost:5174</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-react">⚛ React App<br><small>App.tsx → Pages</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-proxy">🔀 Vite Proxy<br><small>/api/* forwards</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-express">📡 Express Server<br><small>localhost:3001</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-sqlite">🗄 SQLite DB<br><small>uniconnect.db</small></div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <span class="callout-icon">💡</span>
+    <div>
+      <strong>Step by step:</strong> You click "Sign In" → React calls <code>api.post('/api/auth/login', ...)</code> → Vite sees <code>/api</code> and forwards the request to the Express server at port 3001 → Express routes it to <code>routes/auth.js</code> → The handler queries the <code>Users</code> table in SQLite → Verifies the password hash → Creates a JWT token → Sends it back as JSON → React stores the token and navigates to the Dashboard.
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">🔑</span>
+    <div>
+      <strong>The Proxy trick:</strong> The React frontend runs on port 5174, but the backend runs on port 3001. Normally, browsers block requests across different ports (CORS). The <code>vite.config.ts</code> says: "Any request starting with <code>/api</code> — secretly forward it to port 3001." So the browser thinks it's talking to one server, but Vite is silently routing API calls to Express behind the scenes.
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 3: FRONTEND FILES ═══════════════════════ -->
+<section id="frontend-files">
+  <h2>Frontend Files Breakdown <span class="tag">src/</span></h2>
+  <p class="subtitle">Every single file in the frontend, what it does, and how it fits into the bigger picture.</p>
+
+  <!-- Entry -->
+  <div class="file-section">
+    <h3>Entry Points</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">main.tsx</span>
+          <span class="file-tag tag-config">Entry</span>
+        </div>
+        <p>The very first file that runs. It imports React, finds the <code>&lt;div id="root"&gt;</code> element in <code>index.html</code>, and mounts the entire <code>&lt;App /&gt;</code> component inside it. This is the "ignition key" of the application. It also imports <code>index.css</code> so global styles load immediately. Wrapped in <code>&lt;StrictMode&gt;</code> which enables extra development warnings.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">App.tsx</span>
+          <span class="file-tag tag-page">Master Router</span>
+        </div>
+        <p>The central orchestrator. Manages three critical pieces of state: <code>currentUser</code> (who's logged in), <code>currentPage</code> (which page to show), and <code>isAdmin</code> (student vs admin mode). It renders the <code>AppShell</code> layout (Sidebar + TopBar) and conditionally renders the correct page component based on <code>currentPage</code>. Also handles session restoration from <code>localStorage</code> on page reload, login/logout flows, and the navigation function passed down to every page.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">index.css</span>
+          <span class="file-tag tag-style">Global Styles</span>
+        </div>
+        <p>Contains all global CSS rules — the dark background, font imports (Inter from Google Fonts), glassmorphism card effects (<code>.authCard</code>), keyframe animations (<code>@keyframes fadeIn</code>, <code>@keyframes slideUp</code>), message bubble styles, hover transitions, and CSS variables. Every component in the app inherits from these base styles.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services -->
+  <div class="file-section">
+    <h3>Services — <code>src/services/</code></h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">api.ts</span>
+          <span class="file-tag tag-service">Service</span>
+        </div>
+        <p>The HTTP client for the entire app. Exports an <code>api</code> object with methods: <code>api.get()</code>, <code>api.post()</code>, <code>api.put()</code>, <code>api.patch()</code>, <code>api.delete()</code>. Each method calls a generic <code>request()</code> function that automatically attaches the JWT token from <code>localStorage</code> as a <code>Bearer</code> header, converts the body to JSON, and throws descriptive errors on failure. Also exports <code>setToken()</code> and <code>getToken()</code> for managing login state.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">theme.ts</span>
+          <span class="file-tag tag-service">Service</span>
+        </div>
+        <p>The design token file. Exports a <code>C</code> (Colors) object containing every color used in the app — background shades (<code>base</code>, <code>depth</code>, <code>surface</code>), accent colors (<code>cyan</code>, <code>amber</code>, <code>green</code>, <code>red</code>, <code>purple</code>), and text colors (<code>tx</code>, <code>txS</code>, <code>txM</code>). Also exports pre-built style objects: <code>inp</code> (input field), <code>btnP</code> (primary button), <code>btnS</code> (secondary), <code>btnD</code> (danger/red), <code>btnG</code> (green/success), and <code>cardStyle()</code> (standard card wrapper). Changing a color here updates it everywhere.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Types -->
+  <div class="file-section">
+    <h3>Types — <code>src/types/</code></h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">index.ts</span>
+          <span class="file-tag tag-data">Type Definitions</span>
+        </div>
+        <p>Defines the TypeScript interfaces (data shapes) used across the entire app. <code>User</code> describes a student/admin account (userId, name, email, department, semester, status, role, etc.). <code>Resource</code> describes a marketplace item. <code>StudyGroup</code> describes a group with members and announcements. <code>AuthPageProps</code> defines the props that authentication pages receive (navigation and login callbacks). These ensure every component gets exactly the data it expects.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Components -->
+  <div class="file-section">
+    <h3>Shared Components — <code>src/components/</code></h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Avatar.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>Renders a circular avatar with the user's initials. Takes <code>name</code> and <code>size</code> as props. Generates a deterministic background color from the name string using a hash function, so the same name always produces the same color. Used throughout the app wherever a user's face would normally appear.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Badge.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A small colored label used to tag entities. Accepts a <code>label</code> string and a <code>color</code>. Renders as a pill-shaped element with a semi-transparent background tinted to the given color. Used for things like "CS401", "Creator", "Book", etc.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StatusBadge.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A specialized badge that maps statuses to colors and labels. Pass <code>status="available"</code> and it renders a green "Available" pill. Pass <code>status="blocked"</code> and it renders red. Handles: available, active, borrowed, pending, paused, flagged, public, private, resolved, blocked, rejected, approved.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StarRating.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>Renders 1-5 stars. Filled stars are amber, empty stars are grey. Takes a <code>rating</code> number. Used in transaction history and user reviews to display borrower feedback scores.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StatCard.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A dashboard metric card showing a label, large value, icon, and subtitle. Used on the Dashboard and Admin Dashboard to display stats like "Active Users: 42" or "Pending Reports: 3".</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Tabs.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A horizontal tab bar. Takes an array of tab objects (id, label, optional count badge) and renders clickable pills. The active tab gets a highlighted style. Used in Study Groups ("My Groups / Discover / Create"), Resources ("Browse / Post / My Listings"), etc.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">SectionHeader.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A page title block with a title, subtitle, and optional action button on the right. Used at the top of every major page to provide a consistent header layout.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Modal.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A full-screen overlay with a centered card. Shows a title, close button (X), and renders any children inside. Used for forms like "Schedule Handover", "Rate User", and "Report Item". Clicking the backdrop closes it.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">FormField.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A simple wrapper that renders a label above any form input. Takes a <code>label</code> string and wraps its children with consistent spacing and typography. Keeps all forms looking uniform.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">EmptyState.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>Shown when a list has no items. Displays a large icon, title text, optional subtitle, and optional action button. Example: "You haven't joined any groups" with an "Explore Groups" button.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StudentCard.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A card displaying a student's info — avatar, name, department, mutual courses, and action buttons (Send Request, View Profile). Used on the Study Partners page to browse potential partners.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">ResourceCard.tsx</span>
+          <span class="file-tag tag-component">Component</span>
+        </div>
+        <p>A card showing a marketplace resource — title, category badge, condition, status, owner name, and custom action elements (Borrow, Contact). Used on the Resources browse tab.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="file-section">
+    <h3>Pages — <code>src/pages/</code></h3>
+
+    <div class="callout callout-amber">
+      <span class="callout-icon">📁</span>
+      <div>Each page is a self-contained React component managing its own state, API calls, and rendering. Pages receive <code>user</code> and <code>onNavigate</code> props from <code>App.tsx</code>.</div>
+    </div>
+
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">LoginPage.tsx</span>
+          <span class="file-tag tag-page">Auth Page</span>
+        </div>
+        <p>The student login screen. Renders email/password fields with the UniConnect branding. On submit, calls <code>POST /api/auth/login</code>, stores the returned JWT token, and passes the user data up to <code>App.tsx</code> via <code>onLogin()</code>. Also has links to Register, Forgot Password, and Admin Portal.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">AdminLoginPage.tsx</span>
+          <span class="file-tag tag-page">Auth Page</span>
+        </div>
+        <p>Identical flow to LoginPage but styled differently with a shield icon and admin branding. Authenticates via the same <code>/api/auth/login</code> endpoint but sends admin credentials.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">RegisterPage.tsx</span>
+          <span class="file-tag tag-page">Auth Page</span>
+        </div>
+        <p>New user registration form. Collects name, email (must end in <code>@university.edu</code>), password (with confirmation), department, and semester. Calls <code>POST /api/auth/register</code>. On success, navigates to the verification page.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">VerifyStudentPage.tsx</span>
+          <span class="file-tag tag-page">Auth Page</span>
+        </div>
+        <p>Post-registration verification screen. Accepts a Student ID for identity confirmation. Calls <code>POST /api/auth/verify</code>. On success, navigates to login.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">ResetPasswordPage.tsx</span>
+          <span class="file-tag tag-page">Auth Page</span>
+        </div>
+        <p>Password recovery form. Takes email + Student ID to verify identity, then accepts a new password. Calls <code>POST /api/auth/reset-password</code>.</p>
+      </div>
+
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">DashboardPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>The main landing screen after login. Fetches <code>GET /api/users/dashboard</code> which returns aggregated stats (partner count, group count, resource count). Renders StatCards and a welcome message with the user's name. Quick-action buttons navigate to other pages.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">ProfilePage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Displays and edits the current user's profile. Shows avatar, name, department, bio, semester, average rating. Has an edit mode toggled by a button. Fetches <code>GET /api/users/profile</code> and saves via <code>PUT /api/users/profile</code>. Also contains privacy toggles (show email, show rating, allow partner requests) that send <code>PUT /api/users/privacy</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StudyPartnersPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Three-tab layout: Discover (browse students), My Partners (accepted connections), Requests (pending inbound/outbound). Fetches from <code>GET /api/partners</code>, <code>GET /api/partners/requests</code>. Search and filter by name/department. Send requests via <code>POST /api/partners/request</code>, accept/decline via <code>PUT /api/partners/:id</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">StudyGroupsPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Three tabs: My Groups, Discover, Create Group. Group detail view shows members list (with remove capability for creators), announcement feed, and leave button. Create form has name, description, course code, max members, and public/private toggle. APIs: <code>/api/groups/mine</code>, <code>/api/groups/discover</code>, <code>/api/groups/:id</code>, <code>POST /api/groups</code>, etc.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">ResourcesPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>The largest page (~17KB). Five tabs: Browse (searchable catalog with category filters), Post Resource (listing form), My Listings (with pause/resume/delete), Borrow Requests (approve/reject inbound requests), and Lending History (with return confirmation and rating). Modals for scheduling handovers, rating borrowers, and filing disputes.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">MessagesPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Split-pane messaging interface. Left sidebar shows conversation list (with online indicators and unread badges) and suggested study partners. Right pane displays the active conversation with message bubbles (styled differently for sent vs received). Real-time polling every 2 seconds. APIs: <code>GET /api/messages</code>, <code>GET /api/messages/:id/messages</code>, <code>POST /api/messages/send</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">NotificationsPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Chronological feed of system notifications. Each notification has a type-specific icon (partner request = UserPlus, borrow = Package, group = Layers) and color. Click to mark as read. "Mark all read" button. Polls <code>GET /api/notifications</code> every 3 seconds.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">LostFoundPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>Campus lost & found board. Cards show item type (Lost/Found), description, location, reporter, and status. Filter buttons: All, Lost, Found, Open. Report modal collects description, location, and optional image. APIs: <code>GET /api/lost-found</code>, <code>POST /api/lost-found</code>, <code>PUT /api/lost-found/:id/resolve</code>.</p>
+      </div>
+
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">AdminDashboardPage.tsx</span>
+          <span class="file-tag tag-page">Admin Page</span>
+        </div>
+        <p>Admin-only overview. Shows platform-wide stats (total users, active loans, overdue items, pending reports). Lists pending actions with links to relevant admin pages. Shows platform health bars. Fetches <code>GET /api/admin/dashboard</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">AdminUsersPage.tsx</span>
+          <span class="file-tag tag-page">Admin Page</span>
+        </div>
+        <p>Full user management table. Columns: User (avatar + name + email), Department, Status (active/blocked), Joined date, Reports, Actions. Search bar filters by name or email. Block/Unblock toggle calls <code>PUT /api/admin/users/:id/block</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">AdminResourcesPage.tsx</span>
+          <span class="file-tag tag-page">Admin Page</span>
+        </div>
+        <p>Moderates marketplace listings. Shows each resource with owner info, category, status, and report count. Flagged items get a red border. Remove button calls <code>DELETE /api/admin/resources/:id</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">AdminReportsPage.tsx</span>
+          <span class="file-tag tag-page">Admin Page</span>
+        </div>
+        <p>Displays user-submitted reports (abuse, harassment, disputes). Each report shows type, description, reported user, reporter, date, and status. Admin actions: Start Investigation, Mark Resolved, Escalate. Calls <code>PUT /api/admin/reports/:id</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 4: BACKEND FILES ═══════════════════════ -->
+<section id="backend-files">
+  <h2>Backend Files Breakdown <span class="tag">server/</span></h2>
+  <p class="subtitle">Every file in the Express.js backend and what role it plays.</p>
+
+  <div class="file-section">
+    <h3>Core Server Files</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">index.js</span>
+          <span class="file-tag tag-config">Entry</span>
+        </div>
+        <p>The server's main entry point. Loads environment variables via <code>dotenv</code>, initializes the database, imports all 9 route files, sets up CORS and JSON parsing middleware, mounts each route group under its <code>/api/</code> prefix, adds a <code>/api/health</code> endpoint, and starts listening on port 3001.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">db.js</span>
+          <span class="file-tag tag-data">Database</span>
+        </div>
+        <p>Opens (or creates) the SQLite database file <code>uniconnect.db</code>. Enables WAL mode (Write-Ahead Logging) for better concurrent read/write performance, turns on foreign key enforcement, and runs <code>CREATE TABLE IF NOT EXISTS</code> for all 12 tables. Exports the <code>db</code> object that every route file uses to run queries.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">.env</span>
+          <span class="file-tag tag-config">Config</span>
+        </div>
+        <p>Environment variables file. Contains <code>JWT_SECRET</code> (the signing key for tokens) and <code>PORT</code>. Loaded by <code>dotenv</code> at startup. This file should never be committed to public repositories in a real production app.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">seed.js / seed.cjs</span>
+          <span class="file-tag tag-data">Script</span>
+        </div>
+        <p>Database seeding scripts. Run with <code>npm run seed</code> to populate the database with demo data — sample students (with Pakistani university names), admin accounts, study groups, resources, and sample conversations. Used for development and demonstrations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <h3>Middleware — <code>server/middleware/</code></h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">auth.js</span>
+          <span class="file-tag tag-middleware">Middleware</span>
+        </div>
+        <p>Exports two functions. <code>authMiddleware</code>: extracts the JWT from the <code>Authorization: Bearer &lt;token&gt;</code> header, verifies it against the secret key, and attaches the decoded payload (<code>{ id, role }</code>) to <code>req.user</code>. If invalid, responds with 401. <code>adminMiddleware</code>: checks if <code>req.user.role === 'admin'</code>, otherwise responds 403. These are used as Express middleware — route files chain them before their handlers.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <h3>API Routes — <code>server/routes/</code></h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">auth.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/auth/*</span>
+        </div>
+        <p>Handles registration (<code>POST /register</code> — validates @university.edu emails, hashes passwords with bcrypt, creates UUID), login (<code>POST /login</code> — verifies credentials, issues JWT), student verification (<code>POST /verify</code>), and password reset (<code>POST /reset-password</code>).</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">users.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/users/*</span>
+        </div>
+        <p>Profile operations. <code>GET /profile</code> returns the logged-in user's full profile. <code>PUT /profile</code> updates name, bio, department, semester. <code>PUT /privacy</code> toggles visibility settings. <code>GET /dashboard</code> returns aggregate counts used by DashboardPage. All routes require <code>authMiddleware</code>.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">partners.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/partners/*</span>
+        </div>
+        <p>Study partner matching. <code>GET /</code> lists potential partners (excluding existing connections). <code>GET /mine</code> lists accepted partners. <code>GET /requests</code> lists pending requests. <code>POST /request</code> sends a partner request. <code>PUT /:id</code> accepts or declines. <code>DELETE /:id</code> removes a partner.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">groups.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/groups/*</span>
+        </div>
+        <p>Study group operations. <code>POST /</code> creates a group (auto-adds creator as member). <code>GET /mine</code> lists user's groups. <code>GET /discover</code> lists public groups. <code>GET /:id</code> returns full detail with members and announcements. <code>POST /:id/join</code>, <code>DELETE /:id/leave</code>, <code>DELETE /:id/members/:userId</code> (creator only), <code>POST /:id/announcements</code> (creator only).</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">resources.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/resources/*</span>
+        </div>
+        <p>The largest route file (~8.5KB). Handles the complete resource lending lifecycle: listing, browsing (with search & category filters), borrow requests, approvals/rejections, handover scheduling, return confirmations, ratings, dispute filing, pause/resume toggling, and deletion. Maps to Use Cases 15-27.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">messages.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/messages/*</span>
+        </div>
+        <p>Messaging system. <code>GET /</code> lists all conversations with the last message preview. <code>GET /:id/messages</code> returns all messages in a conversation (each tagged with <code>mine: 1/0</code>). <code>POST /send</code> creates a message. If no conversation exists between two users, it automatically creates one.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">notifications.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/notifications/*</span>
+        </div>
+        <p><code>GET /</code> returns all notifications for the current user. <code>PUT /:id/read</code> marks one as read. <code>PUT /read-all</code> marks all as read. Notifications are created by other route handlers (e.g., when someone sends a partner request, a notification is inserted).</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">lostfound.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/lost-found/*</span>
+        </div>
+        <p><code>GET /</code> returns all lost & found items with reporter names. <code>POST /</code> creates a new report (type: Lost/Found, description, location). <code>PUT /:id/resolve</code> marks an item as resolved/reunited.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">admin.js</span>
+          <span class="file-tag tag-route">Route</span>
+          <span style="font-size:12px;color:var(--tx-m);">→ /api/admin/*</span>
+        </div>
+        <p>Admin-only endpoints (protected by both <code>authMiddleware</code> and <code>adminMiddleware</code>). <code>GET /dashboard</code> returns platform-wide aggregations. <code>GET /users</code> returns all accounts. <code>PUT /users/:id/block</code> toggles blocked status. <code>GET /resources</code> returns flagged listings. <code>DELETE /resources/:id</code> removes a listing. <code>GET /reports</code> returns all reports. <code>PUT /reports/:id</code> updates report status.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 5: DATABASE ═══════════════════════ -->
+<section id="database">
+  <h2>The Database Schema <span class="tag">SQLite Tables</span></h2>
+  <p class="subtitle">All 12 tables created by <code>db.js</code>, with their columns and relationships.</p>
+
+  <div class="schema-grid">
+    <div class="schema-card">
+      <h4>Users</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">name</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">email</span> <span class="col-type">TEXT UNIQUE</span></li>
+        <li><span class="col-name">passwordHash</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">department</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">semester</span> <span class="col-type">INTEGER</span></li>
+        <li><span class="col-name">bio</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">role</span> <span class="col-type">DEFAULT 'student'</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'active'</span></li>
+        <li><span class="col-name">avgRating</span> <span class="col-type">REAL DEFAULT 0</span></li>
+        <li><span class="col-name">visibility</span> <span class="col-type">DEFAULT 'public'</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>PartnerRequests</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">fromId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">toId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'pending'</span></li>
+        <li><span class="col-name">createdAt</span> <span class="col-type">datetime</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>StudyGroups</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">name</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">description</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">courseCode</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">maxMembers</span> <span class="col-type">INT DEFAULT 8</span></li>
+        <li><span class="col-name">visibility</span> <span class="col-type">DEFAULT 'public'</span></li>
+        <li><span class="col-name">creatorId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>GroupMembers</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">userId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">groupId</span> <span class="col-type">→ StudyGroups(id)</span></li>
+        <li><span class="col-name">role</span> <span class="col-type">DEFAULT 'member'</span></li>
+        <li style="color:var(--tx-m); font-style:italic">UNIQUE(userId, groupId)</li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Resources</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">title</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">category</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">condition</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">maxDays</span> <span class="col-type">INT DEFAULT 7</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'available'</span></li>
+        <li><span class="col-name">ownerId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>BorrowRequests</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">resourceId</span> <span class="col-type">→ Resources(id)</span></li>
+        <li><span class="col-name">requesterId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">duration</span> <span class="col-type">INTEGER</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'pending'</span></li>
+        <li><span class="col-name">handoverLoc</span> <span class="col-type">TEXT</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Transactions</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">resourceId</span> <span class="col-type">→ Resources(id)</span></li>
+        <li><span class="col-name">borrowerId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">startDate</span> <span class="col-type">datetime</span></li>
+        <li><span class="col-name">dueDate</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">returnDate</span> <span class="col-type">TEXT (nullable)</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'active'</span></li>
+        <li><span class="col-name">rating</span> <span class="col-type">INTEGER</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Conversations & Messages</h4>
+      <ul>
+        <li style="color:var(--amber); font-weight:600">Conversations:</li>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">user1Id</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">user2Id</span> <span class="col-type">→ Users(id)</span></li>
+        <li style="color:var(--amber); font-weight:600; margin-top:8px">Messages:</li>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">convId</span> <span class="col-type">→ Conversations(id)</span></li>
+        <li><span class="col-name">senderId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">text</span> <span class="col-type">TEXT</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Notifications</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">userId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">content</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">type</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">isRead</span> <span class="col-type">INT DEFAULT 0</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>LostFound</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">type</span> <span class="col-type">TEXT (Lost/Found)</span></li>
+        <li><span class="col-name">description</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">location</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'open'</span></li>
+        <li><span class="col-name">reporterId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Reports</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">type</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">description</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">reportedId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">reporterId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'pending'</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>GroupAnnouncements</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">groupId</span> <span class="col-type">→ StudyGroups(id)</span></li>
+        <li><span class="col-name">authorId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">content</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">createdAt</span> <span class="col-type">datetime</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 6: CONFIG ═══════════════════════ -->
+<section id="config">
+  <h2>Configuration Files <span class="tag">Root</span></h2>
+  <p class="subtitle">The config files in the project root that control build tools, TypeScript, and linting.</p>
+
+  <div class="file-list">
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">package.json</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>The project's identity card. Lists the project name (<code>sda-uniconnect</code>), version, scripts (<code>dev</code>, <code>build</code>, <code>lint</code>, <code>preview</code>), all runtime dependencies, and all dev dependencies. <code>npm install</code> reads this file to know what to download.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">vite.config.ts</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>Vite's configuration. Registers the React plugin (enables JSX/TSX compilation), and sets up the <strong>API proxy</strong> — any request to <code>/api/*</code> during development is forwarded to <code>http://localhost:3001</code> where the Express server lives. This eliminates CORS issues.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">tsconfig.json</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>The root TypeScript config. References two sub-configs: <code>tsconfig.app.json</code> (for source code) and <code>tsconfig.node.json</code> (for config files like vite.config.ts). This split ensures different TypeScript rules apply to browser code vs. Node.js code.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">tsconfig.app.json</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>TypeScript settings for the React app. Key options: <code>target: ES2020</code> (modern JS output), <code>jsx: react-jsx</code> (automatic JSX transform, no need to <code>import React</code> manually), <code>strict: true</code> (enables all type-checking), <code>noUnusedLocals</code>, and <code>noUnusedParameters</code>.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">eslint.config.js</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>ESLint configuration. ESLint is a code quality tool that scans your code for potential errors, unused variables, and style issues. This config enables TypeScript-aware rules and React-specific hooks checks (e.g., "you forgot a dependency in useEffect").</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">index.html</span>
+        <span class="file-tag tag-config">Entry HTML</span>
+      </div>
+      <p>The only HTML file. Contains a <code>&lt;div id="root"&gt;&lt;/div&gt;</code> where React mounts the entire app, and a <code>&lt;script type="module" src="/src/main.tsx"&gt;</code> tag that tells the browser to start loading the app. Vite uses this as the entry point for the build.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">.gitignore</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>Tells Git which files to exclude from version control. Ignores <code>node_modules/</code> (thousands of dependency files), <code>dist/</code> (build output), and editor-specific files. These folders are regenerated from <code>package.json</code> so there's no need to track them.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 7: DEPENDENCIES ═══════════════════════ -->
+<section id="deps">
+  <h2>Every Single Dependency <span class="tag">package.json</span></h2>
+  <p class="subtitle">What each installed package does — split between the frontend and backend.</p>
+
+  <div class="dep-table-wrap">
+    <h4>🖥 Frontend Runtime Dependencies</h4>
+    <table>
+      <thead><tr><th>Package</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>react</td><td>The core React library. Provides <code>useState</code>, <code>useEffect</code>, component rendering, and the virtual DOM diffing algorithm. Every component you see is powered by this.</td></tr>
+        <tr><td>react-dom</td><td>The bridge between React and the actual browser DOM. The <code>createRoot()</code> function that mounts your app lives here. React itself is platform-agnostic — react-dom makes it work in browsers specifically.</td></tr>
+        <tr><td>lucide-react</td><td>An icon library. Provides 1000+ SVG icons as React components. Instead of finding and importing icon images, you write <code>&lt;Search size={16} /&gt;</code> and get a crisp, scalable vector icon. Used everywhere for buttons, navigation, status indicators.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="dep-table-wrap">
+    <h4>🛠 Frontend Dev Dependencies</h4>
+    <table>
+      <thead><tr><th>Package</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>vite</td><td>The build tool and dev server. Serves files during development with hot reload, and bundles everything for production. Only used during development, not shipped to users.</td></tr>
+        <tr><td>@vitejs/plugin-react</td><td>Teaches Vite how to compile JSX/TSX (React's HTML-like syntax) into regular JavaScript that browsers understand. Also enables Fast Refresh — edit a component and see it update without losing state.</td></tr>
+        <tr><td>typescript</td><td>The TypeScript compiler. Checks your code for type errors and converts <code>.ts</code>/<code>.tsx</code> files to <code>.js</code>. Vite uses esbuild for fast compilation during dev, but the full <code>tsc</code> is used for the production build and type checking.</td></tr>
+        <tr><td>@types/react</td><td>Type definitions for React. Tells TypeScript what props each built-in React feature accepts — like "useState returns a value and a setter function." Without this, TypeScript wouldn't understand React code.</td></tr>
+        <tr><td>@types/react-dom</td><td>Type definitions for react-dom. Same idea — teaches TypeScript about <code>createRoot()</code> and other DOM-specific React APIs.</td></tr>
+        <tr><td>@types/node</td><td>Type definitions for Node.js built-in modules (fs, path, etc.). Needed because <code>vite.config.ts</code> uses Node.js features.</td></tr>
+        <tr><td>eslint</td><td>A static code analysis tool. Scans your code without running it and flags potential bugs, unused variables, and style violations. Think of it as a spell-checker for code.</td></tr>
+        <tr><td>@eslint/js</td><td>The official ESLint base configuration providing recommended JavaScript rules.</td></tr>
+        <tr><td>typescript-eslint</td><td>An ESLint plugin that adds TypeScript-specific rules. Catches things like <code>any</code> types, unused type imports, and type-unsafe patterns that plain ESLint can't detect.</td></tr>
+        <tr><td>eslint-plugin-react-hooks</td><td>Enforces the "Rules of Hooks" — React's requirements for how <code>useState</code>, <code>useEffect</code>, etc. must be called. Catches bugs like missing dependency arrays.</td></tr>
+        <tr><td>eslint-plugin-react-refresh</td><td>Ensures your components are compatible with Vite's Fast Refresh. Warns if you export something that would break hot reloading.</td></tr>
+        <tr><td>globals</td><td>Provides a list of global variable names (like <code>window</code>, <code>document</code>, <code>console</code>) so ESLint knows they exist and doesn't flag them as undefined.</td></tr>
+        <tr><td>tailwindcss</td><td>A utility-first CSS framework. Currently included in the project setup but the app primarily uses inline styles via the <code>theme.ts</code> token system. Available for future use.</td></tr>
+        <tr><td>@tailwindcss/postcss</td><td>PostCSS plugin that processes Tailwind directives (<code>@tailwind base</code>) and generates the final CSS output.</td></tr>
+        <tr><td>postcss</td><td>A CSS processing pipeline. Tailwind and Autoprefixer plug into it. Transforms CSS before it reaches the browser.</td></tr>
+        <tr><td>autoprefixer</td><td>Automatically adds vendor prefixes to CSS rules (e.g., <code>-webkit-</code>, <code>-moz-</code>) so styles work across all browsers without manual effort.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="dep-table-wrap">
+    <h4>📡 Backend Dependencies (server/package.json)</h4>
+    <table>
+      <thead><tr><th>Package</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>express</td><td>The web server framework. Provides routing (<code>app.get()</code>, <code>app.post()</code>), middleware chaining, request/response handling, and the entire HTTP server infrastructure. The backbone of the backend.</td></tr>
+        <tr><td>better-sqlite3</td><td>A synchronous SQLite driver for Node.js. Unlike most database libraries that use callbacks/promises, this runs queries instantly and returns results. Extremely fast (C++ binding). Creates and reads the <code>uniconnect.db</code> file.</td></tr>
+        <tr><td>bcryptjs</td><td>Password hashing library. When a user registers, their password is run through bcrypt's one-way hashing algorithm (with a salt) so the original password is never stored. On login, it compares the hash. Even if the database is stolen, passwords can't be reversed.</td></tr>
+        <tr><td>jsonwebtoken</td><td>Creates and verifies JWT tokens. <code>jwt.sign()</code> encodes a payload with a secret key. <code>jwt.verify()</code> decodes it and confirms it hasn't been tampered with. Used for stateless authentication.</td></tr>
+        <tr><td>cors</td><td>Cross-Origin Resource Sharing middleware. Adds HTTP headers that tell browsers "yes, this server accepts requests from different origins." Without it, the browser would block the React app from talking to the Express server.</td></tr>
+        <tr><td>dotenv</td><td>Loads environment variables from the <code>.env</code> file into <code>process.env</code>. Keeps sensitive values (like JWT secrets) out of source code. One line — <code>require('dotenv').config()</code> — and all your secrets are available as environment variables.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 8: GLOSSARY ═══════════════════════ -->
+<section id="glossary">
+  <h2>Glossary of Terms <span class="tag">Reference</span></h2>
+  <p class="subtitle">Quick definitions for terms you'll encounter throughout the codebase.</p>
+
+  <div class="dep-table-wrap">
+    <table>
+      <thead><tr><th style="width:180px">Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>Component</td><td>A reusable piece of UI in React. Can be as small as a button or as large as an entire page. Written as a JavaScript function that returns JSX.</td></tr>
+        <tr><td>JSX / TSX</td><td>A syntax extension that lets you write HTML-like code inside JavaScript. <code>&lt;div className="card"&gt;Hello&lt;/div&gt;</code> is JSX. TSX is the same thing but in TypeScript files.</td></tr>
+        <tr><td>Props</td><td>Short for "properties." Data passed from a parent component to a child component. Like function arguments but for UI components. Example: <code>&lt;Avatar name="Ali" size={32} /&gt;</code></td></tr>
+        <tr><td>State</td><td>Data that changes over time within a component. Managed with <code>useState()</code>. When state changes, React automatically re-renders the component to reflect the new data.</td></tr>
+        <tr><td>Hook</td><td>Special React functions that start with <code>use</code>. <code>useState</code> manages data, <code>useEffect</code> runs side effects (API calls, timers), <code>useRef</code> holds mutable references.</td></tr>
+        <tr><td>useEffect</td><td>A hook that runs code after the component renders. Used for fetching data, setting up intervals, or subscribing to events. The dependency array controls when it re-runs.</td></tr>
+        <tr><td>API Endpoint</td><td>A specific URL on the server that performs an action. <code>GET /api/users/profile</code> fetches a profile, <code>POST /api/auth/login</code> logs you in.</td></tr>
+        <tr><td>REST</td><td>An architectural style for APIs. Uses HTTP methods: GET (read), POST (create), PUT (update), DELETE (remove). Each URL represents a resource.</td></tr>
+        <tr><td>Middleware</td><td>A function that runs between the incoming request and the route handler. Express middleware can check authentication, log requests, parse JSON bodies, etc.</td></tr>
+        <tr><td>CORS</td><td>Cross-Origin Resource Sharing. A browser security feature that blocks requests to different domains/ports unless the server explicitly allows it.</td></tr>
+        <tr><td>Proxy</td><td>An intermediary that forwards requests. Vite's proxy forwards <code>/api</code> requests to the Express server so the browser thinks everything comes from one origin.</td></tr>
+        <tr><td>HMR</td><td>Hot Module Replacement. When you save a file, Vite updates only the changed module in the browser without a full page reload. State is preserved.</td></tr>
+        <tr><td>Token (JWT)</td><td>An encoded string containing user data (ID, role) signed with a secret key. Sent with every API request to prove identity. Expires after a set time.</td></tr>
+        <tr><td>Hash (bcrypt)</td><td>A one-way transformation of a password. You can verify a password against its hash, but you can't reverse the hash back to the password.</td></tr>
+        <tr><td>Foreign Key</td><td>A column in one database table that references the primary key of another table. Enforces data integrity — e.g., a Message's <code>senderId</code> must refer to an existing User.</td></tr>
+        <tr><td>WAL Mode</td><td>Write-Ahead Logging. A SQLite performance optimization where writes go to a separate log file first, allowing simultaneous reads. Improves concurrency.</td></tr>
+        <tr><td>node_modules</td><td>The folder containing all installed packages. Generated by <code>npm install</code>. Can contain thousands of files. Never committed to Git — regenerated from <code>package.json</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>UniConnect Technical Guide — Built for <span>sda-uniconnect</span> · Last updated April 2026</p>
+</footer>
+
+</body>
+</html>

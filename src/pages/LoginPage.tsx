@@ -11,8 +11,8 @@ import type { AuthPageProps } from '../types';
 // registration, and password reset. Enter key is fully supported.
 
 export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("l241234@lhr.nu.edu.pk");
+  const [password, setPassword] = useState("12345678");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
