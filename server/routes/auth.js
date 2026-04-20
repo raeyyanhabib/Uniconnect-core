@@ -83,6 +83,12 @@ router.post('/login', (req, res) => {
     return res.status(403).json({ error: 'Account has been blocked' });
   }
 
+  // Don't let unverified students into the platform — they need to complete
+  // the verification step first (admins skip this check)
+  if (!user.isVerified && user.role !== 'admin') {
+    return res.status(403).json({ error: 'Please verify your student status before logging in', needsVerification: true, userId: user.id });
+  }
+
   const token = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: '7d' });
 
   res.json({
