@@ -1,11 +1,12 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { C } from '../services/theme';
 
 interface ModalProps { title: React.ReactNode; onClose: () => void; children: React.ReactNode; width?: number; }
 
 export default function Modal({ title, onClose, children, width = 500 }: ModalProps) {
-  return (
+  return createPortal(
     <div className="overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: width }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 0" }}>
@@ -14,6 +15,7 @@ export default function Modal({ title, onClose, children, width = 500 }: ModalPr
         </div>
         <div style={{ padding: "16px 24px 24px" }}>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
