@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Layers, Package, BarChart2, UserCheck, Flag, MapPin, BookOpen, MessageSquare, Bell, User, LogOut, Newspaper } from 'lucide-react';
 import { C } from './services/theme';
 import type { User as UserType } from './types';
