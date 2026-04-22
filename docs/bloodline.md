@@ -18,8 +18,8 @@ As the pieces fell into place, the workload grew, requiring an organized divisio
 
 ## Team Responsibilities
 
-- **Raeyyan Habib (24L-0690):** login, register, verify student, resetpassword
-- **Muaz Afzal Khan (24L-0740):** dashboard, studypartners, studygroups
-- **Hassaan Faisal (24L-0884):** Resources, messages, lost^found
-- **Hassan Rizwan (24L-0891):** notif, profile, adminlogin
-- **Abdulrehman Ahmad (24L-0555):** rest admin ones
+- **Raeyyan Habib (24L-0690):** Spearheaded the core authentication systems, focusing entirely on secure user access. This involved engineering the student registration pipeline, verification flows, login mechanics, and the password reset features.
+- **Abdulrehman Ahmad (24L-0555):** Directed the development of the primary administrative interfaces and ecosystem tools. His responsibilities included designing and structuring the remainder of the core admin console features to ensure smooth platform oversight.
+- **Muaz Afzal Khan (24L-0740):** Led the implementation of essential user engagement and connectivity panels. He successfully architected the main interactive dashboard alongside the comprehensive study groups and study partners modules.
+- **Hassaan Faisal (24L-0884):** Championed the creation of peer-to-peer interactive utilities and marketplace hubs. This covered the development of the direct messaging system, the shared resources platform, and the lost-and-found sections.
+- **Hassan Rizwan (24L-0891):** Managed critical administrative onboarding and real-time user feedback systems. He was primarily responsible for building the real-time notification engine, profile management systems, and the admin login gateway.
