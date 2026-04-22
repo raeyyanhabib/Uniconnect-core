@@ -37,6 +37,7 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
   const [discoverableStudents, setDiscoverableStudents] = useState<Student[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<PartnerRequest[]>([]);
   const [myPartners, setMyPartners] = useState<Student[]>([]);
+  const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
 
 
   // Load all three data sets (search results, pending requests, current partners)
@@ -73,7 +74,7 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
   const sendRequest = async (userId: string) => {
     try {
       await api.post('/api/partners/requests', { toId: userId });
-      alert("Partner request sent!");
+      setSentRequests(prev => new Set(prev).add(userId));
     } catch (err) {
       alert("Error: " + (err instanceof Error ? err.message : String(err)));
     }
@@ -145,7 +146,13 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
               <StudentCard key={student.id} student={student} actionEl={
                 student.status === "blocked"
                   ? <Badge label="Account Blocked" color={C.red} />
-                  : <div style={{ display: "flex", gap: 8 }}>
+                  : sentRequests.has(student.id)
+                    ? <div style={{ display: "flex", gap: 8 }}>
+                        <button disabled style={{ ...btnP, padding: "7px 14px", fontSize: 12, background: "lightgrey", color: "#666", borderColor: "lightgrey" }}>
+                          <Check size={14} /> Request Sent
+                        </button>
+                      </div>
+                    : <div style={{ display: "flex", gap: 8 }}>
                       <button onClick={() => sendRequest(student.id)} style={{ ...btnP, padding: "7px 14px", fontSize: 12 }}>
                         <UserPlus size={14} /> Send Request
                       </button>

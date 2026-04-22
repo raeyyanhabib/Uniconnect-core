@@ -121,15 +121,19 @@ The project utilizes a Mono-repo layout tying a React/Vite front to an Express b
 - Goal: Close critical security vulnerabilities in the authentication and registration pipelines.
 - Details: Removed hardcoded test credentials (alex.chen/password123) and admin credentials (admin@university.edu/admin123) from LoginPage.tsx that were exposed in the JavaScript bundle. Added server/.env and SQLite database files (*.db, *.db-shm, *.db-wal) to .gitignore and removed them from git tracking to prevent JWT secrets and runtime data from being pushed to GitHub. Eliminated the hardcoded JWT_SECRET fallback in auth middleware — the server now requires a proper .env configuration and refuses to start without one. Created server/.env.example as a safe template for developers. Enforced student verification on login — unverified users are now blocked from accessing the platform until they complete the verification step (admins are exempt). Added server-side FAST-NU email domain validation on registration to match the frontend regex, preventing attackers from bypassing the UI with curl to register with non-university emails.
 
-### Phase 7: Core Testing & Socket Architecture (Upcoming)
+### Phase 7: UI Enhancements & Bug Fixes (Completed — hassaan13)
+- Goal: Fix UI inconsistencies and improve interaction clarity.
+- Details: Fixed the "Send Request" button in Study Partners interface to reliably change its active state to "Request Sent" with a light grey background upon safely dispatching the partner request payload.
+
+### Phase 8: Core Testing & Socket Architecture (Upcoming)
 - Goal: Ensure the platform is resilient against vulnerabilities and introduce raw latency upgrades.
 - Details: Integrate Socket.io to transform Messages into instant real-time channels instead of delayed HTTP polling. Conduct comprehensive end-to-end testing of all user journeys to verify UI/API integrations post-modularization.
 
-### Phase 8: Beta Launch & User Onboarding (Upcoming)
+### Phase 9: Beta Launch & User Onboarding (Upcoming)
 - Goal: Deploy the application to a live server and invite an initial cohort of users.
 - Details: Configure production environments (e.g., Docker, Nginx, cloud hosting). Run a closed beta for a select group of students to gather feedback, stress-test the database, and identify any usability friction.
 
-### Phase 9: Final Polish & Full Release (Upcoming)
+### Phase 10: Final Polish & Full Release (Upcoming)
 - Goal: Official campus-wide launch of the UniConnect platform.
 - Details: Iterate on beta feedback to resolve minor issues. Begin full-scale marketing and onboarding processes. Establish long-term monitoring for server health and user metrics.
 
