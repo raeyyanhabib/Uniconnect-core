@@ -71,7 +71,7 @@ Instead of having everything in a massive `App.tsx`, we made this new project in
 - 'StudyPartnersPage.tsx'
 - 'VerifyStudentPage.tsx'
   
-- `components/`: Reusable UI components 
+**Components - Reusable UI components**
   
 - 'Avatar.tsx'
 - 'Badge.tsx'
@@ -89,7 +89,7 @@ Instead of having everything in a massive `App.tsx`, we made this new project in
 - **Types (in `src/types/`)**:
 - 'index.ts'
   
-- `services/`: API (`api.ts`) and Design Tokens (`theme.ts`).
+  **services/:** API (`api.ts`) and Design Tokens (`theme.ts`).
 
 ## Next Steps
 - Implement real-time WebSockets for instant messaging (replacing polling).
