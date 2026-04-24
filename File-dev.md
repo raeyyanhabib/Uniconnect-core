@@ -50,8 +50,8 @@ Instead of having everything in a massive `App.tsx`, we made this new project in
 - 'App.tsx'
 - 'index.css'
 - 'main.tsx'
+
 - `pages/`: Modular page components (Dashboard, Partners, Groups, etc.).
-- 
 - 'AddNewsPage.tsx'
 - 'AdminDashboardPage.tsx'
 - 'AdminLoginPage.tsx'
@@ -70,9 +70,9 @@ Instead of having everything in a massive `App.tsx`, we made this new project in
 - 'StudyGroupsPage.tsx'
 - 'StudyPartnersPage.tsx'
 - 'VerifyStudentPage.tsx'
-- 
+  
 - `components/`: Reusable UI components 
-- 
+  
 - 'Avatar.tsx'
 - 'Badge.tsx'
 - 'EmptyState.tsx'
