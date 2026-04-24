@@ -100,6 +100,18 @@ UC34: Admin issues a temporary block on a violating student profile.
       -> /src/services/api.ts (Admin endpoints)
 
 ---------------------------------------------------
+PHASE 8: DASHBOARD & NOTIFICATIONS (UC35 - UC38)
+---------------------------------------------------
+UC35: Student views real-time synced News and Lost & Found on Dashboard.
+      -> /src/pages/DashboardPage.tsx , /server/routes/news.js
+UC36: Student manages personal To-Do list with full persistence.
+      -> /src/pages/DashboardPage.tsx , /server/routes/todos.js
+UC37: Student manages personal campus events on Dashboard.
+      -> /src/pages/DashboardPage.tsx , /server/routes/events.js
+UC38: System displays real-time unread message counts in sidebar.
+      -> /src/App.tsx , /server/routes/messages.js
+
+---------------------------------------------------
 UTILITIES & UI ARCHITECTURE
 ---------------------------------------------------
 * Consistent UI headers implemented across all views.
@@ -108,3 +120,5 @@ UTILITIES & UI ARCHITECTURE
   -> /src/components/Tabs.tsx
 * Real-time theming adjustments via service integrations.
   -> /src/services/theme.ts
+* Conversational developer comments added for code clarity.
+  -> All files in /src and /server

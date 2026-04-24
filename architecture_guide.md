@@ -46,7 +46,7 @@ Understanding how pages utilize reusable components helps you maintain UI consis
 | **RegisterPage** | `FormField` | New student sign-up. Links to: `LoginPage`. |
 | **VerifyStudentPage** | `FormField` | OTP / Email verification. Links to: `LoginPage`. | 
 | **ResetPasswordPage** | `FormField` | Password recovery. Links to: `LoginPage`. |
-| **DashboardPage** | `StatCard` | Main portal view. Links to: `StudyPartnersPage`, `StudyGroupsPage`, `ResourcesPage`. |
+| **DashboardPage** | `StatCard`, `BookOpen`, `Plus`, `Trash2`, `Edit2`, `Check`, `X` | Main portal view with live synced News, Todos, Events, and Lost & Found widgets. |
 | **StudyPartnersPage** | `Badge`, `Avatar`, `StarRating`, `SectionHeader`, `Tabs`, `EmptyState`, `StudentCard` | Finding connections. Links to: `MessagesPage` (when messaging a partner). |
 | **StudyGroupsPage** | `Badge`, `Avatar`, `StatusBadge`, `SectionHeader`, `Tabs`, `EmptyState`, `FormField` | Creating/joining groups. |
 | **ResourcesPage** | `Badge`, `Avatar`, `StatusBadge`, `StarRating`, `SectionHeader`, `Tabs`, `FormField`, `Modal`, `ResourceCard` | Campus market. Links to: `MessagesPage` (to negotiate resource items). |

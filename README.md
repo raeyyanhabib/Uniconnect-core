@@ -12,6 +12,16 @@ We kept the vibes clean and formal, but with enough punch to keep it interesting
 
 ---
 
+## Latest Updates 🌟 (April 24, 2026)
+
+We've been busy! Here’s the latest on what’s new:
+- **Live Dashboard**: No more fake data. Your News, To-Do List, Events, and Lost & Found widgets are now fully synced with the backend.
+- **Task Management**: You can now add, edit, and delete your To-Dos and Events directly from the dashboard.
+- **Smart Notifications**: The message badge now shows real unread counts and clears automatically when you read your chats.
+- **Dev-Friendly Code**: Added conversational comments throughout the codebase to make it easier for the team to jump in.
+
+---
+
 ## Tech Stack 🛠
 
 We aren't messing around out here. Here’s the sauce:
@@ -20,6 +30,7 @@ We aren't messing around out here. Here’s the sauce:
 - **Icons:** Lucide React
 - **Backend:** Node.js + Express (serving the good stuff)
 - **Database:** SQLite with `better-sqlite3` (lightweight, blazing fast)
+- **Architecture:** Fully modular, feature-based routing.
 
 ---
 

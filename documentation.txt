@@ -91,6 +91,7 @@ The project utilizes a Mono-repo layout tying a React/Vite front to an Express b
     - `groups.js` (UC 10-14)
     - `resources.js` (UC 15-27)
     - `messages.js`, `notifications.js`, `lostfound.js`
+    - `news.js`, `todos.js`, `events.js` (Dashboard Widgets)
     - `admin.js` (UC 32-34)
 
 ---
@@ -125,15 +126,19 @@ The project utilizes a Mono-repo layout tying a React/Vite front to an Express b
 - Goal: Fix UI inconsistencies and improve interaction clarity.
 - Details: Fixed the "Send Request" button in Study Partners interface to reliably change its active state to "Request Sent" with a light grey background upon safely dispatching the partner request payload.
 
-### Phase 8: Core Testing & Socket Architecture (Upcoming)
+### Phase 8: Dashboard Sync & Notification Logic (Completed — April 24, 2026)
+- Goal: Connect the main portal widgets to the backend and fix notification inaccuracies.
+- Details: Replaced all mock data on the DashboardPage with live API calls. Created new backend routes (`news.js`, `todos.js`, `events.js`) and corresponding SQLite tables to persist dashboard data. Implemented full CRUD for user-specific To-Dos and Events directly on the dashboard. Resolved a critical UI bug where the message notification badge was hardcoded; it now reflects real-time unread counts from the server and clears automatically when conversations are read. Added minimal conversational comments to every frontend page and key backend files to improve developer onboarding and code clarity.
+
+### Phase 9: Core Testing & Socket Architecture (Upcoming)
 - Goal: Ensure the platform is resilient against vulnerabilities and introduce raw latency upgrades.
 - Details: Integrate Socket.io to transform Messages into instant real-time channels instead of delayed HTTP polling. Conduct comprehensive end-to-end testing of all user journeys to verify UI/API integrations post-modularization.
 
-### Phase 9: Beta Launch & User Onboarding (Upcoming)
+### Phase 10: Beta Launch & User Onboarding (Upcoming)
 - Goal: Deploy the application to a live server and invite an initial cohort of users.
 - Details: Configure production environments (e.g., Docker, Nginx, cloud hosting). Run a closed beta for a select group of students to gather feedback, stress-test the database, and identify any usability friction.
 
-### Phase 10: Final Polish & Full Release (Upcoming)
+### Phase 11: Final Polish & Full Release (Upcoming)
 - Goal: Official campus-wide launch of the UniConnect platform.
 - Details: Iterate on beta feedback to resolve minor issues. Begin full-scale marketing and onboarding processes. Establish long-term monitoring for server health and user metrics.
 
