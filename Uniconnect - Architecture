@@ -31,10 +31,12 @@ This document maps the project's technical implementation to its core features.
 | **Partners** | `StudyPartnersPage` | `partners.js` | `PartnerRequests` |
 | **Groups** | `StudyGroupsPage` | `groups.js` | `StudyGroups`, `GroupMembers` |
 | **Market** | `ResourcesPage` | `resources.js` | `Resources`, `Transactions` |
-| **Chat** | `MessagesPage` | `messages.js` | `Messages` |
+| **Chat** | `MessagesPage` | `messages.js` | `Conversations`, `Messages` |
+| **Notifications** | `App.tsx` | `notifications.js` | `Notifications` |
 | **Admin** | `AdminDashboardPage` | `admin.js` | All Tables |
 
 ## 🚀 Recent Execution (April 24, 2026)
-- **Dashboard Sync**: Connected News, To-Dos, and Events to the database.
-- **Notifications**: Dynamic unread message count logic.
-- **Developer Clarity**: Conversational comments added across all files.
+- **Dashboard Sync**: Connected News, To-Dos, and Events to the database for full persistence.
+- **Messaging Infrastructure**: Added `Conversations` logic to handle 1v1 chats and fixed notification badge decrements.
+- **Security Hardening**: Enforced FAST-NU email validation and JWT integrity checks.
+- **Documentation**: Synchronized master documentation (`documentation Uniconnect d1.txt`) and architecture plans.
