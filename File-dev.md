@@ -51,7 +51,7 @@ Instead of having everything in a massive `App.tsx`, we made this new project in
 - 'index.css'
 - 'main.tsx'
 
-** `pages/`**
+**Pages**
 - 'AddNewsPage.tsx'
 - 'AdminDashboardPage.tsx'
 - 'AdminLoginPage.tsx'
