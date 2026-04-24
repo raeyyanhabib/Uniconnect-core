@@ -1,42 +1,94 @@
-# UniConnect - Development Status & Scenario
+# UniConnect 
 
 This document tracks the current state of the UniConnect project as of April 24, 2026.
 
 ## Current Scenario
-
 The project has transitioned from a static UI prototype to a fully functional full-stack application with a modular frontend and a persistent SQLite backend.
 
-### 1. Synchronized Dashboard
-The Dashboard is now live and synced with the backend database. 
-- **University News**: Articles are fetched from the database. Users can add new articles via the Add News page.
-- **To-Do List**: Full CRUD persistence. Students can add, edit, toggle (done/undone), and delete tasks directly from the dashboard.
-- **Upcoming Events**: Students can manage their own events (Add/Edit/Delete) with database persistence.
-- **Lost & Found**: Real-time syncing of recent reports on the dashboard.
+### Project Initialization
+- Run `npx create-vite@latest sda-uniconnect --template react-ts` in `d:\AG Projects`.
+- Install the basic base dependencies found in your current project: `lucide-react`, `tailwindcss`, `postcss`, `autoprefixer`, etc.
+- Configure `tailwind.config.js` or `index.css` with basic setup.
 
-### 2. Messaging & Notifications
-- **Dynamic Badge**: The red notification badge in the sidebar now reflects real-time unread message counts fetched from the server.
-- **Auto-Read**: Opening a conversation automatically marks messages as read, clearing the notification badge instantly.
-- **Live Updates**: Polling mechanisms ensure that messages and notifications stay fresh without manual refreshes.
-
-### 3. Backend Architecture
-- **SQLite Integration**: Using `better-sqlite3` for a robust, local relational database.
-- **Modular Routes**: API is organized into feature-based route files (auth, users, partners, groups, resources, messages, news, todos, events, etc.).
-- **Auth Middleware**: JWT-based authentication protects all sensitive endpoints.
-
-### 4. Code Documentation
-- **Conversational Comments**: Minimal, conversational comments have been added to every frontend page and key backend files to facilitate peer review and future development without cluttering the UI code.
-
-## File Structure
+### File Names & Structure
+Instead of having everything in a massive `App.tsx`, we made this new project in an early, modular stage just by creating the directory structure and the file names. The files will contain basic skeleton code (just boilerplate functions).
 
 ### Backend (`/server`)
-- `index.js`: Main entry point and route registration.
-- `db.js`: Database schema and connection.
-- `routes/`: Feature-specific API endpoints (including the newly added `news.js`, `todos.js`, and `events.js`).
+**Middleware (in `server/middleware/`)**:
+- 'auth.js'
+
+**Routes (in `server/routes/`)**:
+- 'admin.js'
+- 'auth.js'
+- 'events.js'
+- 'groups.js'
+- 'lostfound.js'
+- 'messages.js'
+- 'news.js'
+- 'notifications.js'
+- 'partners.js'
+- 'resources.js'
+- 'todos.js'
+- 'users.js'
+
+**Server Root (in `server/`)**:
+- '.env'
+- '.env.example'
+- 'db.js'
+- 'index.js'
+- 'package-lock.json'
+- 'package.json'
+- 'seed.js'
+- 'uniconnect.db'
+- 'uniconnect.db-shm'
+- 'uniconnect.db-wal'
 
 ### Frontend (`/src`)
-- `App.tsx`: Main routing and global state (auth, notifications).
+
+**Root Files (in `src/`)**:
+- 'App.css'
+- 'App.tsx'
+- 'index.css'
+- 'main.tsx'
 - `pages/`: Modular page components (Dashboard, Partners, Groups, etc.).
-- `components/`: Reusable UI components (StatCard, Badge, Avatar, etc.).
+- 
+- 'AddNewsPage.tsx'
+- 'AdminDashboardPage.tsx'
+- 'AdminLoginPage.tsx'
+- 'AdminReportsPage.tsx'
+- 'AdminResourcesPage.tsx'
+- 'AdminUsersPage.tsx'
+- 'DashboardPage.tsx'
+- 'LoginPage.tsx'
+- 'LostFoundPage.tsx'
+- 'MessagesPage.tsx'
+- 'NotificationsPage.tsx'
+- 'ProfilePage.tsx'
+- 'RegisterPage.tsx'
+- 'ResetPasswordPage.tsx'
+- 'ResourcesPage.tsx'
+- 'StudyGroupsPage.tsx'
+- 'StudyPartnersPage.tsx'
+- 'VerifyStudentPage.tsx'
+- 
+- `components/`: Reusable UI components 
+- 
+- 'Avatar.tsx'
+- 'Badge.tsx'
+- 'EmptyState.tsx'
+- 'FormField.tsx'
+- 'Modal.tsx'
+- 'ResourceCard.tsx'
+- 'SectionHeader.tsx'
+- 'StarRating.tsx'
+- 'StatCard.tsx'
+- 'StatusBadge.tsx'
+- 'StudentCard.tsx'
+- 'Tabs.tsx'
+
+- **Types (in `src/types/`)**:
+- 'index.ts'
+  
 - `services/`: API (`api.ts`) and Design Tokens (`theme.ts`).
 
 ## Next Steps
@@ -44,5 +96,3 @@ The Dashboard is now live and synced with the backend database.
 - Add image upload support for Lost & Found and Resources.
 - Enhance the Admin Portal with more moderation tools.
 
----
-*Author: Raeyyan Habib*
