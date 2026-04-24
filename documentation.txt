@@ -1,145 +1,37 @@
-# UniConnect Project Documentation & Master Log
+# UniConnect Use Case & File Mapping
 
-## 1. Project Origins & The Core Vision
-UniConnect originated from a master blueprint (`democore.txt`) designed to build the ultimate, highly-secure university ecosystem. It was conceived as a monolith React-Node application bridging academic networking (Study Partners, Groups), an active campus marketplace (Resource Lending), secure communications (Messages), and administrative oversight.
+## Authentication & Identity
+- **UC 1: Student Registration** -> `RegisterPage.tsx`, `auth.js`
+- **UC 2: Student Login & JWT** -> `LoginPage.tsx`, `auth.js`
+- **UC 3: Password Reset** -> `ResetPasswordPage.tsx`, `auth.js`
+- **UC OTP: Identity Verification** -> `VerifyStudentPage.tsx`, `auth.js`
 
-The project is actively being hydrated—transitioning from its initial mockup state powered by massive static React arrays into a fully networked, SQLite-driven, REST-fueled powerhouse. It has now been successfully architected from a monolith into a clean, highly modular React repository (`sda-uniconnect`).
+## Profile & Privacy
+- **UC 4: Profile Management** -> `ProfilePage.tsx`, `users.js`
+- **UC 6: Privacy Settings** -> `ProfilePage.tsx`, `users.js`
+- **UC 7: Student Search** -> `StudyPartnersPage.tsx`, `partners.js`
 
----
+## Academic Ecosystem
+- **UC 8-9: Study Partner Requests** -> `StudyPartnersPage.tsx`, `partners.js`
+- **UC 10-12: Study Groups** -> `StudyGroupsPage.tsx`, `groups.js`
+- **UC 13-14: Group Management** -> `StudyGroupsPage.tsx`, `groups.js`
 
-## 2. The Comprehensive Use Case (UC) Ledger
-The platform's operations are strictly mapped to the following Use Cases:
+## Campus Marketplace (Resources)
+- **UC 15-17: List & Browse Resources** -> `ResourcesPage.tsx`, `resources.js`
+- **UC 18-22: Borrow & Return Lifecycle** -> `ResourcesPage.tsx`, `resources.js`
+- **UC 23-25: Ratings & Moderation** -> `ResourcesPage.tsx`, `resources.js`
+- **UC 26-27: Listing Management** -> `ResourcesPage.tsx`, `resources.js`
 
-### Authentication & Identification
-- UC 1: Student Registration (Enforced `@university.edu` email validation)
-- UC 2: Student Login & JWT Issuance
-- UC 3: Password Reset & Account Recovery
+## Dashboard & Sync
+- **UC 35: Live News & Lost/Found** -> `DashboardPage.tsx`, `news.js`, `lostfound.js`
+- **UC 36: Personal To-Do List** -> `DashboardPage.tsx`, `todos.js`
+- **UC 37: Personal Events** -> `DashboardPage.tsx`, `events.js`
+- **UC 38: Live Message Counts** -> `App.tsx`, `MessagesPage.tsx`, `messages.js`
 
-### Academic Ecosystem
-- UC 4: Profile View & Update (Name, Bio, Department, Semester)
-- UC 6: Advanced Privacy Settings (Hide metrics, toggle visibility)
-- UC 7: Search Students Database (Directory matching by Name/Department)
-- UC 8: Dispatch Study Partner Requests
-- UC 9: Process Partner Requests (Accept/Decline/Remove)
-- UC 10: Construct Study Groups (Define course codes, capacity, visibility)
-- UC 11: Discover & Join Public Study Groups
-- UC 12: Leave Study Groups
-- UC 13: Creator Privileges: Moderate Group Members
-- UC 14: Creator Privileges: Broadcast Group Announcements
+## Administrative Governance
+- **UC 32: Health Metrics** -> `AdminDashboardPage.tsx`, `admin.js`
+- **UC 33: User Governance** -> `AdminUsersPage.tsx`, `admin.js`
+- **UC 34: Moderation** -> `AdminReportsPage.tsx`, `AdminResourcesPage.tsx`, `admin.js`
 
-### The Campus Marketplace (Resources)
-- UC 15: List New Marketplace Resource (Books, Equipment, Notes)
-- UC 16: Browse Global Resources Catalog
-- UC 17: Dispatch Borrow Request
-- UC 18: Evaluate Borrow Request (Approve & Schedule Handover / Reject)
-- UC 19: Owner Action: Confirm Item Handover
-- UC 20: Borrower Action: Confirm Item Receipt
-- UC 21: Borrower Action: Initiate Return Protocol
-- UC 22: Owner Action: Confirm Item Returned
-- UC 23: Post-Transaction: Rate Borrower Behavior
-- UC 24: Dispute Resolution: File Damage/Overdue Reports
-- UC 25: Flag Malicious/Inappropriate Resource Listings
-- UC 26: Owner Action: Pause/Resume Listing Visibility
-- UC 27: Delete Owned Listing
-
-### Auxiliary Systems
-- UC 28: Real-time Peer-to-Peer Encrypted Messaging
-- UC 29: Automated System Notifications
-- UC 30: Submit Lost & Found Missing Item Tickets
-- UC 31: Track & Resolve Lost Items
-
-### Administrative Governance
-- UC 32: View Global Health Metrics (Admin Dashboard)
-- UC 33: User Governance (Block/Unblock Malicious Accounts)
-- UC 34: Enforce Moderation (Delete flagged resources, Escalate/Resolve reports)
-
----
-
-## 3. Database Schema Overview (SQLite)
-The application relies on `better-sqlite3` initialized via `server/db.js`. 
-- `Users`: Primary tracking entity. Contains sensitive auth data (hashed via `bcrypt`), JWT tokens, roles (`student` vs `admin`), profile data, and privacy toggles.
-- `PartnerRequests`: Joins `fromId` and `toId` tracking the `pending`, `accepted`, or `declined` states.
-- `StudyGroups`: Contains maximum capacities, course codes, and visibility.
-- `GroupMembers`: Relational mapping tracking which User belongs to which Group, and their specific authorization `role`.
-- `GroupAnnouncements`: Bound uniquely to study groups ensuring only group members see broadcasts.
-- `Resources`: Defines active marketplace items, statuses, classifications, and `reportCount` for Admin flagging flags.
-- `Transactions`: Ledger of every borrow event tying a `resourceId`, an `ownerId`, and a `borrowerId` together through complex handover status enums indefinitely tracking the lifecycle of an asset.
-- `Messages` & `Notifications`: Chat structures mapped by timestamps and `read` boolean flags.
-- `LostAndFound` & `Reports`: Auxiliary support tables scaling admin oversight.
-
----
-
-## 4. File Architecture & Data Flow
-The project utilizes a Mono-repo layout tying a React/Vite front to an Express back, formally migrated to `sda-uniconnect`.
-
-### The Frontend Layer (`/src`)
-- `main.tsx`: Bootstraps the React DOM and triggers Vite HMR.
-- `types/index.ts`: Strongly typed interfaces providing comprehensive object definitions (e.g., `User`, `StudyGroup`).
-- `services/`: Stores logic like `theme.ts` (design tokens) and `api.ts` (API requests with generic `Authorization: Bearer <token>` Headers).
-- `components/`: Pure functional components storing modular UI like `Avatar`, `StatusBadge`, `StatCard`, etc.
-- `pages/`: Individual modular views separated out of legacy monolith routes (e.g. `LoginPage.tsx`, `DashboardPage.tsx`, `AdminDashboardPage.tsx`).
-- `App.tsx`: The primary orchestrator handling identity logic and deciding how the `AppShell` (Sidebar/TopBar) routes into the aforementioned views.
-
-### The Backend Layer (`/server`)
-- `index.js`: Core server bootstrap. Implements CORS payloads, parses incoming `json`, and routes endpoints.
-- `db.js`: Reconstructs database schemas aggressively if they don't exist.
-- `middleware/auth.js`: Supplies `authMiddleware` (validating JWT integrity) and `adminMiddleware` (validating account `role` authorization levels).
-- `routes/`: Distinct API routers isolating logic:
-    - `auth.js` (UC 1-3)
-    - `users.js` (UC 4-6, Aggregations)
-    - `partners.js` (UC 7-9)
-    - `groups.js` (UC 10-14)
-    - `resources.js` (UC 15-27)
-    - `messages.js`, `notifications.js`, `lostfound.js`
-    - `news.js`, `todos.js`, `events.js` (Dashboard Widgets)
-    - `admin.js` (UC 32-34)
-
----
-
-## 5. Comprehensive Project Roadmap
-
-### Phase 1: Dashboard & Profile Hydration (Completed)
-- Goal: Eradicate initial mock data from user profiles and dashboards.
-- Details: Constructed GET /api/users/dashboard. Wired DashboardPage and ProfilePage. Implemented strict @university.edu email parsing validation on registration.
-
-### Phase 2: Admin Panel & Moderation System (Completed)
-- Goal: Empower platform administrators to govern behavior.
-- Details: Verified auth.js securing admin.js. Hydrated AdminDashboardPage, AdminUsersPage, AdminResourcesPage, and AdminReportsPage tying UI toggle flows to PUT/DELETE routines enabling instantaneous user banning and report escalation.
-
-### Phase 3: Study Partners & Groups (Completed)
-- Goal: Substitute static mock arrays for live relational SQLite mapping.
-- Details: Replaced arrays in StudyPartnersPage mapping native useEffect chains to partners.js. Similarly upgraded StudyGroupsPage. 
-
-### Phase 4: The Resource Marketplace & Lost+Found (Completed)
-- Goal: Activate scalable interfaces handling assets and lost property over a central endpoint map.
-- Details: Implemented robust API routines tying into ResourcesPage and LostFoundPage. Enabled students to search, list, request, and transfer physical textbook inventories, whilst deploying robust reporting models on suspicious items.
-
-### Phase 5: System Modernization & App Modularization (Completed)
-- Goal: Modernize frontend architecture. Escape the monolith.
-- Details: Successfully decommissioned the monolithic App.tsx file. Cleanly ripped out components into a modular src/pages/ and src/components/ folder hierarchy to ensure exponential UI maintainability and standard Vite tree-shaking scalability. Integrated the backend source-code safely into the new root. Also fixed a critical state issue where static mock badge counts were causing false notification red dots, replacing them with dynamic backend polling tied to a responsive `uc_notifications_read` browser event.
-
-### Phase 6: Security Hardening & Authentication Fixes (Completed — AbdulRehman)
-- Goal: Close critical security vulnerabilities in the authentication and registration pipelines.
-- Details: Removed hardcoded test credentials (alex.chen/password123) and admin credentials (admin@university.edu/admin123) from LoginPage.tsx that were exposed in the JavaScript bundle. Added server/.env and SQLite database files (*.db, *.db-shm, *.db-wal) to .gitignore and removed them from git tracking to prevent JWT secrets and runtime data from being pushed to GitHub. Eliminated the hardcoded JWT_SECRET fallback in auth middleware — the server now requires a proper .env configuration and refuses to start without one. Created server/.env.example as a safe template for developers. Enforced student verification on login — unverified users are now blocked from accessing the platform until they complete the verification step (admins are exempt). Added server-side FAST-NU email domain validation on registration to match the frontend regex, preventing attackers from bypassing the UI with curl to register with non-university emails.
-
-### Phase 7: UI Enhancements & Bug Fixes (Completed — hassaan13)
-- Goal: Fix UI inconsistencies and improve interaction clarity.
-- Details: Fixed the "Send Request" button in Study Partners interface to reliably change its active state to "Request Sent" with a light grey background upon safely dispatching the partner request payload.
-
-### Phase 8: Dashboard Sync & Notification Logic (Completed — April 24, 2026)
-- Goal: Connect the main portal widgets to the backend and fix notification inaccuracies.
-- Details: Replaced all mock data on the DashboardPage with live API calls. Created new backend routes (`news.js`, `todos.js`, `events.js`) and corresponding SQLite tables to persist dashboard data. Implemented full CRUD for user-specific To-Dos and Events directly on the dashboard. Resolved a critical UI bug where the message notification badge was hardcoded; it now reflects real-time unread counts from the server and clears automatically when conversations are read. Added minimal conversational comments to every frontend page and key backend files to improve developer onboarding and code clarity.
-
-### Phase 9: Core Testing & Socket Architecture (Upcoming)
-- Goal: Ensure the platform is resilient against vulnerabilities and introduce raw latency upgrades.
-- Details: Integrate Socket.io to transform Messages into instant real-time channels instead of delayed HTTP polling. Conduct comprehensive end-to-end testing of all user journeys to verify UI/API integrations post-modularization.
-
-### Phase 10: Beta Launch & User Onboarding (Upcoming)
-- Goal: Deploy the application to a live server and invite an initial cohort of users.
-- Details: Configure production environments (e.g., Docker, Nginx, cloud hosting). Run a closed beta for a select group of students to gather feedback, stress-test the database, and identify any usability friction.
-
-### Phase 11: Final Polish & Full Release (Upcoming)
-- Goal: Official campus-wide launch of the UniConnect platform.
-- Details: Iterate on beta feedback to resolve minor issues. Begin full-scale marketing and onboarding processes. Establish long-term monitoring for server health and user metrics.
-
-*(This document is actively maintained and dynamically updated following every major architectural execution)*
+## System Log (Latest)
+- **April 24, 2026**: Synced all Dashboard widgets (News, Todos, Events, Lost & Found) with SQLite persistence. Fixed notification badge logic for real-time unread message counts. Added conversational comments for developer clarity.
