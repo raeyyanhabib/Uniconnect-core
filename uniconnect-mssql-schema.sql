@@ -1,5 +1,5 @@
 -- UniConnect MSSQL Database Schema
-
+-- The given code is in case we need to use this for our DB Lab project.
 CREATE DATABASE UniConnect;
 GO
 
