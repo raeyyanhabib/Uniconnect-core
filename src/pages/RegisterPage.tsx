@@ -1,3 +1,4 @@
+// yo, this is the registration page — new students sign up here with their FAST-NU email
 import React, { useState } from 'react';
 import { BookOpen, User, Mail, Lock, Building, GraduationCap, Hash, ArrowLeft, RefreshCw, CheckCircle, ChevronRight } from 'lucide-react';
 import { C, inp, btnP, btnS } from '../services/theme';

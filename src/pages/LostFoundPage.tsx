@@ -19,6 +19,7 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
   const [descInput, setDescInput] = useState("");
   const [locInput, setLocInput] = useState("");
 
+  // polls the lost-found API every 3 seconds so new reports show up in real time
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -34,6 +35,7 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
     return () => clearInterval(interval);
   }, []);
 
+  // submits a new lost/found item report to the backend
   const submitReport = async () => {
     if (!descInput || !locInput) return alert("Description and Location are required");
     try {

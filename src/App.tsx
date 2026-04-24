@@ -241,8 +241,9 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [navData, setNavData] = useState<NavData | null>(null);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
+  // Polls the server for unread notification count every 5 seconds
   useEffect(() => {
     if (!currentUser) { setUnreadNotifCount(0); return; }
 
@@ -260,6 +261,22 @@ export default function App() {
       clearInterval(interval);
       window.removeEventListener('uc_notifications_read', fetchCount);
     };
+  }, [currentUser]);
+
+  // Polls the server for unread message count — same idea as notifications above
+  useEffect(() => {
+    if (!currentUser) { setUnreadMessagesCount(0); return; }
+
+    const fetchMsgCount = async () => {
+      try {
+        const res = await api.get('/api/messages/unread-count');
+        setUnreadMessagesCount(res.count || 0);
+      } catch { /* ignore */ }
+    };
+
+    fetchMsgCount();
+    const interval = setInterval(fetchMsgCount, 5000);
+    return () => clearInterval(interval);
   }, [currentUser]);
 
 

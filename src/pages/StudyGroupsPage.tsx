@@ -36,6 +36,7 @@ export default function StudyGroupsPage() {
     fetchGroups();
   }, [tab]);
 
+  // fetches group details (members + announcements) when you click into a specific group
   useEffect(() => {
     let isMounted = true;
     if (selectedGroup) {
@@ -64,6 +65,7 @@ export default function StudyGroupsPage() {
     } catch (err) { console.error(err); }
   };
 
+  // fires off a new study group to the backend and auto-switches to the My Groups tab
   const createGroup = async () => {
     if (!newGroup.name) return alert("Group name required");
     try {

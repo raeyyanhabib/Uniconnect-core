@@ -26,6 +26,7 @@ router.put('/:id/read', (req, res) => {
   res.json({ message: 'Notification marked as read' });
 });
 
+// the sidebar badge pulls this number to show how many unread notifs you have
 // Get unread count
 router.get('/unread-count', (req, res) => {
   const result = db.prepare('SELECT COUNT(*) as count FROM Notifications WHERE userId = ? AND isRead = 0').get(req.user.id);

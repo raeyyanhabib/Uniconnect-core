@@ -1,3 +1,4 @@
+// password reset page — sends a recovery link to the student's email
 import { useState } from 'react';
 import { KeyRound, RefreshCw } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';

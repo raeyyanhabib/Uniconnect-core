@@ -10,6 +10,7 @@ interface NotificationsPageProps { user?: User | null; }
 export default function NotificationsPage({ user: _user }: NotificationsPageProps) {
   const [notifs, setNotifs] = useState<any[]>([]);
 
+  // grabs all notifications from the API and keeps polling every 3 seconds
   useEffect(() => {
     const fetchNs = async () => {
       try {
@@ -22,6 +23,7 @@ export default function NotificationsPage({ user: _user }: NotificationsPageProp
     return () => clearInterval(interval);
   }, []);
 
+  // marks everything as read in one shot and tells the App component to clear the badge
   const markAllRead = async () => {
     try {
       await api.put('/api/notifications/read-all');

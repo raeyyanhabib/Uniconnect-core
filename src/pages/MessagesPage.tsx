@@ -78,8 +78,12 @@ export default function MessagesPage({ user: _user, targetUser }: MessagesPagePr
 
   // When the active conversation changes, fetch all messages in that thread.
   // Also polls every 2 seconds so incoming messages appear live.
+  // Marks messages as read on the backend so the red badge clears.
   useEffect(() => {
     if (!activeConv) return;
+
+    // Mark this conversation as read so the unread badge goes away
+    api.put(`/api/messages/read/${activeConv}`).catch(() => {});
 
     const fetchMsgs = async () => {
       try {

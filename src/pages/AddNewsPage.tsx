@@ -1,23 +1,31 @@
 import { useState } from 'react';
 import { Newspaper, Upload, Check } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';
+import { api } from '../services/api';
 
 interface AddNewsPageProps {
   onNavigate: (page: string) => void;
 }
 
+// The Add News page — lets students broadcast announcements to the dashboard.
+// On submit it fires a POST to /api/news so the article actually persists.
 export default function AddNewsPage({ onNavigate }: AddNewsPageProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      onNavigate("dashboard");
-    }, 1500);
+    try {
+      await api.post('/api/news', { title, content });
+      setSubmitted(true);
+      setTimeout(() => {
+        onNavigate("dashboard");
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (submitted) {

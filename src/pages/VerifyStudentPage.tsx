@@ -1,3 +1,4 @@
+// OTP verification page — student enters their 6-digit code to activate their account
 import { useState } from 'react';
 import { Mail, CheckCircle, RefreshCw } from 'lucide-react';
 import { C, btnP } from '../services/theme';

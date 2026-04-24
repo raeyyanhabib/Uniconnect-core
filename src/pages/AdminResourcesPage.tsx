@@ -1,3 +1,4 @@
+// admin resource listings — lets admins see all resources and nuke flagged ones
 import { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import { C, cardStyle, btnD } from '../services/theme';

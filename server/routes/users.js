@@ -78,6 +78,7 @@ router.put('/me/privacy', (req, res) => {
 });
 
 
+// the dashboard stat cards pull their numbers from here — partners, groups, resources, loans
 // Get real-time dashboard stats for the logged-in user.
 // Counts partners, groups, resources, and active loans from the database.
 router.get('/dashboard', (req, res) => {

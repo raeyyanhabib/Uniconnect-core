@@ -1,3 +1,4 @@
+// user management page — admins can search, view, and block/unblock students from here
 import { useState, useEffect } from 'react';
 import { Search, UserCheck, UserX } from 'lucide-react';
 import { C, cardStyle, inp, btnG, btnD } from '../services/theme';

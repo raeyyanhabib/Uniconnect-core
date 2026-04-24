@@ -2,6 +2,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
+// spins up the SQLite database connection — this is the single source of truth for all UniConnect data
 const db = new Database(path.join(__dirname, 'uniconnect.db'));
 
 // Enable WAL mode for better performance
@@ -145,7 +146,40 @@ db.exec(`
     status      TEXT DEFAULT 'pending',
     createdAt   TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS News (
+    id        TEXT PRIMARY KEY,
+    title     TEXT NOT NULL,
+    content   TEXT,
+    imageUrl  TEXT,
+    authorId  TEXT REFERENCES Users(id),
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS UserTodos (
+    id        TEXT PRIMARY KEY,
+    userId    TEXT REFERENCES Users(id),
+    text      TEXT NOT NULL,
+    isDone    INTEGER DEFAULT 0,
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS UserEvents (
+    id        TEXT PRIMARY KEY,
+    userId    TEXT REFERENCES Users(id),
+    title     TEXT NOT NULL,
+    details   TEXT,
+    eventDate TEXT,
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
 `);
+
+// Safely add isRead column to Messages if it doesn't exist yet
+try {
+  db.prepare("SELECT isRead FROM Messages LIMIT 1").get();
+} catch {
+  db.exec("ALTER TABLE Messages ADD COLUMN isRead INTEGER DEFAULT 0");
+}
 
 console.log('Database ready (uniconnect.db)');
 

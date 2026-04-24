@@ -16,6 +16,9 @@ const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const lostfoundRoutes = require('./routes/lostfound');
 const adminRoutes = require('./routes/admin');
+const newsRoutes = require('./routes/news');
+const todosRoutes = require('./routes/todos');
+const eventsRoutes = require('./routes/events');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,6 +37,9 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/lost-found', lostfoundRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/todos', todosRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -56,6 +62,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
+// boots up the server — everything’s wired, time to listen for incoming requests
 app.listen(PORT, () => {
   console.log(`UniConnect server running on http://localhost:${PORT}`);
 });

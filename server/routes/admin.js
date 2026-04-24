@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(authMiddleware);
 router.use(adminMiddleware);
 
+// this is the main stats engine for the admin panel — counts everything in one big query burst
 // UC 31 — Admin Dashboard Stats
 router.get('/dashboard', (req, res) => {
   const totalUsers = db.prepare('SELECT COUNT(*) as cnt FROM Users WHERE role = ?').get('student').cnt;

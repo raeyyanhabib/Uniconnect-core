@@ -1,3 +1,4 @@
+// admin dashboard — the bird’s eye view of the entire platform’s health and stats
 import { useState, useEffect } from 'react';
 import { Users, Package, Layers, Flag, ChevronRight } from 'lucide-react';
 import { C, cardStyle } from '../services/theme';

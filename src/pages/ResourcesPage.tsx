@@ -34,6 +34,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
   const [borrowReqs, setBorrowReqs] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   
+  // pulls all resource data in one shot — browse list, my listings, borrow requests, and history
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -75,6 +76,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     } catch(err) { console.error(err); }
   };
 
+  // posts a new resource listing to the marketplace — validates title then flips to My Listings tab
   const submitPosting = async () => {
     if (!newResource.title) return alert("Title is required");
     try {

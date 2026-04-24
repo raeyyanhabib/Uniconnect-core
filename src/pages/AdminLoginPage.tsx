@@ -1,3 +1,4 @@
+// admin login portal — separate entry point for university admins with elevated privileges
 import React, { useState } from 'react';
 import { Shield } from 'lucide-react';
 import { C, inp, btnP } from '../services/theme';

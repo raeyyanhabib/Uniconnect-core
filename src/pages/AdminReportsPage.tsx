@@ -1,3 +1,4 @@
+// platform reports page — admins review and resolve flagged content disputes
 import { useState, useEffect } from 'react';
 import { Activity, CheckCircle, Flag } from 'lucide-react';
 import { C, cardStyle, btnG, btnS, btnD } from '../services/theme';

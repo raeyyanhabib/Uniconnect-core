@@ -84,4 +84,26 @@ router.post('/send', (req, res) => {
 });
 
 
+// Get total unread messages for the logged-in user across all conversations
+router.get('/unread-count', (req, res) => {
+  const result = db.prepare(`
+    SELECT COUNT(*) as count FROM Messages m
+    JOIN Conversations c ON c.id = m.convId
+    WHERE (c.user1Id = ? OR c.user2Id = ?)
+      AND m.senderId != ?
+      AND m.isRead = 0
+  `).get(req.user.id, req.user.id, req.user.id);
+  res.json({ count: result?.count || 0 });
+});
+
+// Mark all messages in a conversation as read — fired when the user opens a chat
+router.put('/read/:convId', (req, res) => {
+  db.prepare(`
+    UPDATE Messages SET isRead = 1
+    WHERE convId = ? AND senderId != ? AND isRead = 0
+  `).run(req.params.convId, req.user.id);
+  res.json({ message: 'Marked as read' });
+});
+
+
 module.exports = router;
