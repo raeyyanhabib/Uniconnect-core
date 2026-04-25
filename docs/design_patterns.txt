@@ -1,0 +1,31 @@
+# Design Patterns in UniConnect
+
+This document identifies the design patterns implemented in the UniConnect project.
+
+## 1. Singleton Pattern
+- **Usage**: `src/services/api.ts` exports a single `api` object.
+- **Purpose**: Ensures a unified configuration for all network requests (base URL, headers, error handling) across the entire application.
+
+## 2. Observer / Pub-Sub Pattern
+- **Usage**: `window.addEventListener('uc_notifications_read', fetchCount)` in `App.tsx`.
+- **Purpose**: Allows the `NotificationsPage` to notify the `App` component that notifications have been read, triggering a refresh of the unread count without a direct dependency.
+
+## 3. Component Pattern (Atomic Design)
+- **Usage**: Directory `src/components/` containing reusable UI elements like `Badge`, `Button` (via theme), `Modal`, and `Avatar`.
+- **Purpose**: Promotes reusability and consistency across the application.
+
+## 4. Layout Pattern (Wrapper)
+- **Usage**: `AppShell` function in `App.tsx`.
+- **Purpose**: Wraps different pages with a consistent `Sidebar` and `TopBar`, managing the overall application structure.
+
+## 5. Strategy Pattern
+- **Usage**: `pageLabels` object in `TopBar` (in `App.tsx`).
+- **Purpose**: Maps page IDs to human-readable titles, allowing the UI to "select" the correct title strategy based on the current route.
+
+## 6. Polling Pattern
+- **Usage**: `setInterval` in `App.tsx` and `LostFoundPage.tsx`.
+- **Purpose**: Regularly fetches updates from the server (notifications, messages, lost & found items) to provide a "pseudo-real-time" experience without WebSockets.
+
+## 7. State Lifting Pattern
+- **Usage**: Navigation state (`currentPage`) and user state (`currentUser`) are managed in the root `App` component and passed down via props.
+- **Purpose**: Maintains a "single source of truth" for the application state.

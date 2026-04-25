@@ -45,7 +45,7 @@ export default function DashboardPage({ user, onNavigate }: DashboardPageProps) 
     }).catch(console.error);
 
     api.get('/api/lost-found').then(data => {
-      setLostFound(data.slice(0, 5).map((x: any) => ({
+      setLostFound(data.filter((x: any) => x.status === "open").slice(0, 5).map((x: any) => ({
         id: x.id, type: x.type, description: x.description, location: x.location
       })));
     }).catch(console.error);

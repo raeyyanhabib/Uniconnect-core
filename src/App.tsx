@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Layers, Package, BarChart2, UserCheck, Flag, MapPin, BookOpen, MessageSquare, Bell, User, LogOut, Newspaper } from 'lucide-react';
+import { Users, Layers, Package, BarChart2, UserCheck, Flag, MapPin, BookOpen, MessageSquare, Bell, User, LogOut, Newspaper, ArrowLeft } from 'lucide-react';
 import { C } from './services/theme';
 import type { User as UserType } from './types';
 import Avatar from './components/Avatar';
@@ -153,9 +153,11 @@ interface TopBarProps {
   onNavigate: (page: string) => void;
   unreadNotifCount?: number;
   unreadMessagesCount?: number;
+  onGoBack?: () => void;
+  canGoBack?: boolean;
 }
 
-function TopBar({ user, currentPage, onNavigate, unreadNotifCount = 0, unreadMessagesCount = 0 }: TopBarProps) {
+function TopBar({ user, currentPage, onNavigate, unreadNotifCount = 0, unreadMessagesCount = 0, onGoBack, canGoBack }: TopBarProps) {
 
   // Human-friendly labels for each page ID so the top bar shows a nice title
   const pageLabels: Record<string, string> = {
@@ -167,7 +169,14 @@ function TopBar({ user, currentPage, onNavigate, unreadNotifCount = 0, unreadMes
 
   return (
     <div style={{ height: 58, background: C.depth, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 700, color: C.tx, margin: 0 }}>{pageLabels[currentPage] || "UniConnect"}</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {canGoBack && onGoBack && (
+          <button onClick={onGoBack} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ArrowLeft size={18} />
+          </button>
+        )}
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: C.tx, margin: 0 }}>{pageLabels[currentPage] || "UniConnect"}</h2>
+      </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <button onClick={() => onNavigate("notifications")} style={{ background: "none", border: "none", color: C.txS, cursor: "pointer", position: "relative", padding: 4 }}>
@@ -211,16 +220,18 @@ interface AppShellProps {
   isAdmin?: boolean;
   unreadNotifCount?: number;
   unreadMessagesCount?: number;
+  onGoBack?: () => void;
+  canGoBack?: boolean;
   children: React.ReactNode;
 }
 
-function AppShell({ user, currentPage, onNavigate, isAdmin, unreadNotifCount, unreadMessagesCount, children }: AppShellProps) {
+function AppShell({ user, currentPage, onNavigate, isAdmin, unreadNotifCount, unreadMessagesCount, onGoBack, canGoBack, children }: AppShellProps) {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <Sidebar currentPage={currentPage} onNavigate={onNavigate} user={user} isAdmin={isAdmin} unreadNotifCount={unreadNotifCount} unreadMessagesCount={unreadMessagesCount} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} unreadNotifCount={unreadNotifCount} unreadMessagesCount={unreadMessagesCount} />
+        <TopBar user={user} currentPage={currentPage} onNavigate={onNavigate} unreadNotifCount={unreadNotifCount} unreadMessagesCount={unreadMessagesCount} onGoBack={onGoBack} canGoBack={canGoBack} />
 
         <div style={{ flex: 1, overflowY: "auto", background: C.base }}>
           {children}
@@ -240,6 +251,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [navData, setNavData] = useState<NavData | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
@@ -328,10 +340,21 @@ export default function App() {
       setIsAdmin(false);
       localStorage.removeItem('uc_user');
       localStorage.removeItem('uc_token');
+      setHistory([]);
+    } else {
+      setHistory(prev => [...prev, currentPage]);
     }
 
     setNavData(data || null);
     setCurrentPage(page);
+  };
+
+  const goBack = () => {
+    if (history.length > 0) {
+      const prevPage = history[history.length - 1];
+      setHistory(prev => prev.slice(0, -1));
+      setCurrentPage(prevPage);
+    }
   };
 
 
@@ -374,7 +397,7 @@ export default function App() {
 
   // Main authenticated app — wraps the current page in the shell with sidebar and topbar
   return (
-    <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin} unreadNotifCount={unreadNotifCount} unreadMessagesCount={unreadMessagesCount}>
+    <AppShell user={currentUser} currentPage={currentPage} onNavigate={navigate} isAdmin={isAdmin} unreadNotifCount={unreadNotifCount} unreadMessagesCount={unreadMessagesCount} onGoBack={goBack} canGoBack={history.length > 0}>
 
       {currentPage === "dashboard" && <DashboardPage user={currentUser} onNavigate={navigate} />}
       {currentPage === "addNews" && <AddNewsPage onNavigate={navigate} />}

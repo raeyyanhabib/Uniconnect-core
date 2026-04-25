@@ -1,0 +1,35 @@
+# SOLID Principles in UniConnect
+
+This document outlines how the SOLID principles are applied (or could be improved) within the UniConnect codebase.
+
+## 1. Single Responsibility Principle (SRP)
+Each module or component should have one reason to change.
+- **Application**:
+    - `src/services/api.ts`: Responsible solely for handling network requests and authentication headers.
+    - `src/services/theme.ts`: Responsible for defining the design system tokens and shared styles.
+    - `src/components/`: Components like `Avatar.tsx`, `Badge.tsx`, and `Modal.tsx` have a single responsibility: rendering a specific UI element.
+- **Improvement**: `src/App.tsx` currently handles routing, authentication state, polling for notifications, and global layout. This could be split into a `Router`, `AuthProvider`, and `Layout` component to better adhere to SRP.
+
+## 2. Open-Closed Principle (OCP)
+Software entities should be open for extension but closed for modification.
+- **Application**:
+    - `navGroups` in `App.tsx`: Adding a new page only requires adding an entry to the `navGroups` array; the `Sidebar` component doesn't need to be modified to support new links.
+    - `theme.ts`: The use of color tokens (`C.cyan`, `C.tx`, etc.) allows extending the theme or changing the brand colors without modifying the logic of individual components.
+
+## 3. Liskov Substitution Principle (LSP)
+Objects of a superclass should be replaceable with objects of its subclasses without affecting correctness.
+- **Application**:
+    - React components follow this principle by accepting standard props. For instance, any component that accepts `React.CSSProperties` can handle any valid CSS object.
+    - `UserType` interface: Used consistently across `ProfilePage`, `DashboardPage`, and `App.tsx`, ensuring that any page expecting a user can work with the data returned by the auth flow.
+
+## 4. Interface Segregation Principle (ISP)
+No client should be forced to depend on methods it does not use.
+- **Application**:
+    - Component props are generally tailored to what the component needs. For example, `AvatarProps` only requires `name` and `size`, not the entire `User` object.
+    - `SidebarProps` and `TopBarProps` in `App.tsx` are distinct interfaces that only include the data necessary for those specific parts of the layout.
+
+## 5. Dependency Inversion Principle (DIP)
+High-level modules should not depend on low-level modules; both should depend on abstractions.
+- **Application**:
+    - The `api` object in `src/services/api.ts` provides an abstraction over the `fetch` API. High-level page components depend on the `api` abstraction rather than calling `fetch` directly with hardcoded headers.
+    - Components depend on the `C` object (theme abstraction) rather than hardcoded hex values.

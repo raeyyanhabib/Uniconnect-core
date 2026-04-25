@@ -112,7 +112,8 @@ export default function StudyPartnersPage({ onNavigate }: { onNavigate: (p: stri
   // Filter the search results by department and search query
   const filtered = discoverableStudents.filter(s =>
     (deptFilter === "All" || s.department === deptFilter) &&
-    (searchQuery === "" || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || (s.department || "").toLowerCase().includes(searchQuery.toLowerCase()))
+    (searchQuery === "" || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || (s.department || "").toLowerCase().includes(searchQuery.toLowerCase())) &&
+    !myPartners.some(p => p.userId === s.userId)
   );
 
   const tabs = [

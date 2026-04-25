@@ -51,7 +51,13 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
     } catch(err) { console.error(err); }
   };
 
-  const filtered = items.filter(i => filter === "All" || i.type === filter || (filter === "Open" ? i.status === "open" : i.status === "resolved"));
+  const filtered = items.filter(i => {
+    if (filter === "All") return true;
+    if (filter === "Lost") return i.type === "Lost";
+    if (filter === "Found") return i.type === "Found";
+    if (filter === "Open") return i.status === "open";
+    return true;
+  });
   return (
     <div className="pageAnim" style={{ padding: 28 }}>
       {showReport && (
@@ -82,7 +88,7 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
       <SectionHeader title="Lost & Found" subtitle="Help reunite students with their belongings"
         action={<button onClick={() => setShowReport(true)} style={btnP}><Plus size={16} /> Report Item</button>} />
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        {["All", "Lost", "Found", "Open"].map(f => (
+        {["Open", "Lost", "Found", "All"].map(f => (
           <button key={f} onClick={() => setFilter(f)}
             style={{ padding: "7px 16px", borderRadius: 20, border: `1px solid ${filter === f ? C.cyan : C.border}`, background: filter === f ? `${C.cyan}15` : "none", color: filter === f ? C.cyan : C.txS, cursor: "pointer", fontSize: 13, fontWeight: filter === f ? 600 : 400 }}>
             {f}
