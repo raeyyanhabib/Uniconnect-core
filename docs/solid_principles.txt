@@ -1,35 +1,40 @@
-# SOLID Principles in UniConnect
+SOLID Principles in UniConnect
 
-This document outlines how the SOLID principles are applied (or could be improved) within the UniConnect codebase.
+This file explains how we used SOLID principles in the website.
 
-## 1. Single Responsibility Principle (SRP)
-Each module or component should have one reason to change.
-- **Application**:
-    - `src/services/api.ts`: Responsible solely for handling network requests and authentication headers.
-    - `src/services/theme.ts`: Responsible for defining the design system tokens and shared styles.
-    - `src/components/`: Components like `Avatar.tsx`, `Badge.tsx`, and `Modal.tsx` have a single responsibility: rendering a specific UI element.
-- **Improvement**: `src/App.tsx` currently handles routing, authentication state, polling for notifications, and global layout. This could be split into a `Router`, `AuthProvider`, and `Layout` component to better adhere to SRP.
 
-## 2. Open-Closed Principle (OCP)
-Software entities should be open for extension but closed for modification.
-- **Application**:
-    - `navGroups` in `App.tsx`: Adding a new page only requires adding an entry to the `navGroups` array; the `Sidebar` component doesn't need to be modified to support new links.
-    - `theme.ts`: The use of color tokens (`C.cyan`, `C.tx`, etc.) allows extending the theme or changing the brand colors without modifying the logic of individual components.
+1. Single Responsibility Principle (SRP)
+Each part of the code should only do one thing.
+Where it's used:
+- api.ts only handles network requests and login tokens.
+- theme.ts only handles colors and styles.
+- Components like Avatar and Modal just handle their own specific UI.
+Improvement: App.tsx is a bit big right now because it handles routing, auth, and layout all at once. We could split it up later.
 
-## 3. Liskov Substitution Principle (LSP)
-Objects of a superclass should be replaceable with objects of its subclasses without affecting correctness.
-- **Application**:
-    - React components follow this principle by accepting standard props. For instance, any component that accepts `React.CSSProperties` can handle any valid CSS object.
-    - `UserType` interface: Used consistently across `ProfilePage`, `DashboardPage`, and `App.tsx`, ensuring that any page expecting a user can work with the data returned by the auth flow.
 
-## 4. Interface Segregation Principle (ISP)
-No client should be forced to depend on methods it does not use.
-- **Application**:
-    - Component props are generally tailored to what the component needs. For example, `AvatarProps` only requires `name` and `size`, not the entire `User` object.
-    - `SidebarProps` and `TopBarProps` in `App.tsx` are distinct interfaces that only include the data necessary for those specific parts of the layout.
+2. Open-Closed Principle (OCP)
+The code should be easy to add onto without breaking what's already there.
+Where it's used:
+- navGroups in App.tsx makes it easy to add new pages just by adding to the list.
+- theme.ts uses color tokens so we can change the whole look without touching every file.
 
-## 5. Dependency Inversion Principle (DIP)
-High-level modules should not depend on low-level modules; both should depend on abstractions.
-- **Application**:
-    - The `api` object in `src/services/api.ts` provides an abstraction over the `fetch` API. High-level page components depend on the `api` abstraction rather than calling `fetch` directly with hardcoded headers.
-    - Components depend on the `C` object (theme abstraction) rather than hardcoded hex values.
+
+3. Liskov Substitution Principle (LSP)
+Different components should be able to swap out if they follow the same rules.
+Where it's used:
+- React components use standard props, so they are easy to swap.
+- UserType is used everywhere so any page expecting a user gets exactly what it needs.
+
+
+4. Interface Segregation Principle (ISP)
+Don't force a component to use data it doesn't need.
+Where it's used:
+- AvatarProps only asks for a name and size, not the whole user profile.
+- Sidebar and TopBar have their own specific data requirements.
+
+
+5. Dependency Inversion Principle (DIP)
+High level code shouldn't depend on low level details.
+Where it's used:
+- The api object hides the fetch details from the pages.
+- Components use theme tokens instead of hardcoded hex codes.
