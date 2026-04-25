@@ -62,6 +62,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
 
   const cats = ["All", "Book", "Equipment", "Notes"];
 
+  // Toggles the visibility of your resource listing between active and paused
   const toggleStatus = async (id: string) => {
     try {
       await api.patch(`/api/resources/${id}/toggle`, {});
@@ -69,6 +70,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     } catch(err) { console.error(err); }
   };
 
+  // Permanently deletes one of your resource listings
   const removeResource = async (id: string) => {
     try {
       await api.delete(`/api/resources/${id}`);
@@ -91,6 +93,8 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
   };
 
   // --- Transaction action handlers ---
+
+  // Confirms that the borrower has received the item from the owner
   const confirmReceipt = async (txId: string) => {
     setActionLoading(txId);
     try {
@@ -100,6 +104,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     setActionLoading(null);
   };
 
+  // Notifies the owner that the borrower is ready to return the item
   const initiateReturn = async (txId: string) => {
     setActionLoading(txId);
     try {
@@ -109,6 +114,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     setActionLoading(null);
   };
 
+  // Confirms that the owner has successfully received the returned item
   const confirmReturn = async (txId: string) => {
     setActionLoading(txId);
     try {
@@ -118,6 +124,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     setActionLoading(null);
   };
 
+  // Saves the user's star rating and text review for a completed transaction
   const submitReview = async () => {
     if (!showReview || userRating === 0) return;
     try {
@@ -132,6 +139,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     } catch (err) { console.error(err); }
   };
 
+  // Schedules the exact time and place for the borrower and owner to meet up
   const submitHandover = async () => {
     if (!showHandover) return;
     try {
@@ -144,6 +152,7 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
     } catch (err) { console.error(err); }
   };
 
+  // Submits a formal dispute if an item is damaged, missing, or overdue
   const submitReport = async () => {
     if (!showReport) return;
     try {
@@ -157,11 +166,14 @@ export default function ResourcesPage({ user: _user }: ResourcesPageProps) {
   };
 
   // Helpers
+
+  // Checks if the current date is past the agreed upon return date
   const isOverdue = (rawDueDate: string | null) => {
     if (!rawDueDate) return false;
     return new Date(rawDueDate) < new Date();
   };
 
+  // Calculates how many days are left until the item needs to be returned
   const daysUntilDue = (rawDueDate: string | null) => {
     if (!rawDueDate) return null;
     const diff = Math.ceil((new Date(rawDueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));

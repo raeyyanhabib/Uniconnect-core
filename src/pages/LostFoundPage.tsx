@@ -35,7 +35,7 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // submits a new lost/found item report to the backend
+  // Submits a new lost or found item report to the system so others can see it
   const submitReport = async () => {
     if (!descInput || !locInput) return alert("Description and Location are required");
     try {
@@ -45,6 +45,7 @@ export default function LostFoundPage({ user: _user }: LostFoundPageProps) {
     } catch(err) { console.error(err); }
   };
 
+  // Marks an open lost or found report as successfully resolved (item reunited with owner)
   const resolveItem = async (id: string) => {
     try {
       await api.put(`/api/lost-found/${id}/resolve`);
