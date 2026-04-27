@@ -21,8 +21,18 @@ async function initializeDatabase() {
 
     // Create schema on first run
     try {
+      console.log('Connecting to PostgreSQL...');
+      if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL_NON_POOLING) {
+        throw new Error('DATABASE_URL is missing! Please connect Vercel Postgres in the Storage tab.');
+      }
+      
       const fs = require('fs');
-      const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+      const schemaPath = path.join(__dirname, 'schema.sql');
+      if (!fs.existsSync(schemaPath)) {
+        throw new Error(`Schema file not found at ${schemaPath}`);
+      }
+      
+      const schema = fs.readFileSync(schemaPath, 'utf8');
       const statements = schema.split(';').filter(s => s.trim());
       
       for (const statement of statements) {
@@ -30,9 +40,10 @@ async function initializeDatabase() {
           await pool.query(statement);
         }
       }
-      console.log('PostgreSQL database ready');
+      console.log('PostgreSQL database ready and schema verified');
     } catch (error) {
-      console.error('Error initializing PostgreSQL schema:', error);
+      console.error('CRITICAL DATABASE ERROR:', error.message);
+      if (error.code) console.error('Error Code:', error.code);
       throw error;
     }
 
