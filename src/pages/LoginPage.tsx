@@ -19,7 +19,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
   // Handles the actual login — sends credentials to the API,
   // stores the JWT token, and passes the user data up to the App.
   // The 'role' parameter lets us distinguish between student and admin logins.
-  const handleLogin = async (role: string) => {
+  const handleLogin = async () => {
     setLoading(true);
     setError("");
 
@@ -38,7 +38,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!loading) {
-      handleLogin("student");
+      handleLogin();
     }
   };
 
