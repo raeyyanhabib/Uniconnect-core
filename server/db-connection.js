@@ -177,19 +177,21 @@ function createPostgresAdapter() {
         throw error;
       }
     },
-    transaction: async (fn) => {
-      const client = await pool.connect();
-      try {
-        await client.query('BEGIN');
-        const result = await fn();
-        await client.query('COMMIT');
-        return result;
-      } catch (error) {
-        await client.query('ROLLBACK');
-        throw error;
-      } finally {
-        client.release();
-      }
+    transaction: (fn) => {
+      return async (...args) => {
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+          const result = await fn(...args);
+          await client.query('COMMIT');
+          return result;
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        } finally {
+          client.release();
+        }
+      };
     },
     close: async () => {
       if (pool) await pool.end();

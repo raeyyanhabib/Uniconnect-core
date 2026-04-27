@@ -9,16 +9,16 @@ router.use(adminMiddleware);
 
 // this is the main stats engine for the admin panel — counts everything in one big query burst
 // UC 31 — Admin Dashboard Stats
-router.get('/dashboard', (req, res) => {
-  const totalUsers = db.prepare('SELECT COUNT(*) as cnt FROM Users WHERE role = ?').get('student').cnt;
-  const activeUsers = db.prepare("SELECT COUNT(*) as cnt FROM Users WHERE role = 'student' AND status = 'active'").get().cnt;
-  const blockedUsers = db.prepare("SELECT COUNT(*) as cnt FROM Users WHERE status = 'blocked'").get().cnt;
-  const totalGroups = db.prepare('SELECT COUNT(*) as cnt FROM StudyGroups').get().cnt;
-  const totalResources = db.prepare('SELECT COUNT(*) as cnt FROM Resources').get().cnt;
-  const activeLoans = db.prepare("SELECT COUNT(*) as cnt FROM Transactions WHERE status = 'active'").get().cnt;
-  const overdueLoans = db.prepare("SELECT COUNT(*) as cnt FROM Transactions WHERE status = 'overdue'").get().cnt;
-  const pendingReports = db.prepare("SELECT COUNT(*) as cnt FROM Reports WHERE status = 'pending'").get().cnt;
-  const lostItems = db.prepare("SELECT COUNT(*) as cnt FROM LostFound WHERE type = 'Lost' AND status = 'open'").get().cnt;
+router.get('/dashboard', async (req, res) => {
+  const totalUsers = (await db.prepare('SELECT COUNT(*) as cnt FROM Users WHERE role = ?').get('student')).cnt;
+  const activeUsers = (await db.prepare("SELECT COUNT(*) as cnt FROM Users WHERE role = 'student' AND status = 'active'").get()).cnt;
+  const blockedUsers = (await db.prepare("SELECT COUNT(*) as cnt FROM Users WHERE status = 'blocked'").get()).cnt;
+  const totalGroups = (await db.prepare('SELECT COUNT(*) as cnt FROM StudyGroups').get()).cnt;
+  const totalResources = (await db.prepare('SELECT COUNT(*) as cnt FROM Resources').get()).cnt;
+  const activeLoans = (await db.prepare("SELECT COUNT(*) as cnt FROM Transactions WHERE status = 'active'").get()).cnt;
+  const overdueLoans = (await db.prepare("SELECT COUNT(*) as cnt FROM Transactions WHERE status = 'overdue'").get()).cnt;
+  const pendingReports = (await db.prepare("SELECT COUNT(*) as cnt FROM Reports WHERE status = 'pending'").get()).cnt;
+  const lostItems = (await db.prepare("SELECT COUNT(*) as cnt FROM LostFound WHERE type = 'Lost' AND status = 'open'").get()).cnt;
 
   res.json({
     totalUsers, activeUsers, blockedUsers,
@@ -29,7 +29,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 // UC 32 — List all users
-router.get('/users', (req, res) => {
+router.get('/users', async (req, res) => {
   const { q } = req.query;
   let query = `SELECT id, name, email, department, semester, role, status, avgRating, isVerified, createdAt FROM Users WHERE 1=1`;
   const params = [];
@@ -39,22 +39,22 @@ router.get('/users', (req, res) => {
     params.push(`%${q}%`, `%${q}%`);
   }
   query += ` ORDER BY createdAt DESC`;
-  res.json(db.prepare(query).all(...params));
+  res.json(await db.prepare(query).all(...params));
 });
 
 // UC 32 — Block/Unblock User
-router.put('/users/:id/block', (req, res) => {
-  const user = db.prepare('SELECT status FROM Users WHERE id = ?').get(req.params.id);
+router.put('/users/:id/block', async (req, res) => {
+  const user = await db.prepare('SELECT status FROM Users WHERE id = ?').get(req.params.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const newStatus = user.status === 'blocked' ? 'active' : 'blocked';
-  db.prepare('UPDATE Users SET status = ? WHERE id = ?').run(newStatus, req.params.id);
+  await db.prepare('UPDATE Users SET status = ? WHERE id = ?').run(newStatus, req.params.id);
   res.json({ message: `User ${newStatus}`, status: newStatus });
 });
 
 // UC 33 — List flagged resources
-router.get('/resources', (req, res) => {
-  const resources = db.prepare(`
+router.get('/resources', async (req, res) => {
+  const resources = await db.prepare(`
     SELECT r.*, u.name as ownerName,
            (SELECT COUNT(*) FROM Reports WHERE reportedId = r.ownerId AND type = 'Resource') as reportCount
     FROM Resources r
@@ -65,19 +65,19 @@ router.get('/resources', (req, res) => {
 });
 
 // UC 33 — Remove a resource (admin)
-router.delete('/resources/:id', (req, res) => {
+router.delete('/resources/:id', async (req, res) => {
   const resourceId = req.params.id;
   
   // Start a transaction to ensure atomic deletion
-  const deleteTx = db.transaction(() => {
+  const deleteTx = db.transaction(async () => {
     // Delete dependent records first to satisfy foreign key constraints
-    db.prepare('DELETE FROM BorrowRequests WHERE resourceId = ?').run(resourceId);
-    db.prepare('DELETE FROM Transactions WHERE resourceId = ?').run(resourceId);
-    db.prepare('DELETE FROM Resources WHERE id = ?').run(resourceId);
+    await db.prepare('DELETE FROM BorrowRequests WHERE resourceId = ?').run(resourceId);
+    await db.prepare('DELETE FROM Transactions WHERE resourceId = ?').run(resourceId);
+    await db.prepare('DELETE FROM Resources WHERE id = ?').run(resourceId);
   });
 
   try {
-    deleteTx();
+    await deleteTx();
     res.json({ message: 'Resource and all related records removed' });
   } catch (err) {
     console.error('Failed to delete resource:', err);
@@ -86,8 +86,8 @@ router.delete('/resources/:id', (req, res) => {
 });
 
 // UC 34 — List platform reports
-router.get('/reports', (req, res) => {
-  const reports = db.prepare(`
+router.get('/reports', async (req, res) => {
+  const reports = await db.prepare(`
     SELECT r.*,
            reported.name as reportedName,
            reporter.name as reporterName
@@ -100,12 +100,12 @@ router.get('/reports', (req, res) => {
 });
 
 // UC 34 — Update report status
-router.put('/reports/:id', (req, res) => {
+router.put('/reports/:id', async (req, res) => {
   const { status } = req.body; // 'investigating', 'resolved', 'escalated'
   if (!['investigating', 'resolved', 'escalated'].includes(status)) {
     return res.status(400).json({ error: 'Invalid status' });
   }
-  db.prepare('UPDATE Reports SET status = ? WHERE id = ?').run(status, req.params.id);
+  await db.prepare('UPDATE Reports SET status = ? WHERE id = ?').run(status, req.params.id);
   res.json({ message: `Report marked as ${status}` });
 });
 

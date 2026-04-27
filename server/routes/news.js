@@ -11,8 +11,8 @@ router.use(authMiddleware);
 function uuid() { return crypto.randomUUID(); }
 
 // Grab latest news articles — the dashboard pulls from here to stay synced
-router.get('/', (req, res) => {
-  const news = db.prepare(`
+router.get('/', async (req, res) => {
+  const news = await db.prepare(`
     SELECT n.*, u.name as authorName
     FROM News n
     JOIN Users u ON u.id = n.authorId
@@ -23,12 +23,12 @@ router.get('/', (req, res) => {
 });
 
 // Post a new news article — called from the AddNewsPage form
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { title, content, imageUrl } = req.body;
   if (!title) return res.status(400).json({ error: 'Title is required' });
 
   const id = uuid();
-  db.prepare('INSERT INTO News (id, title, content, imageUrl, authorId) VALUES (?, ?, ?, ?, ?)')
+  await db.prepare('INSERT INTO News (id, title, content, imageUrl, authorId) VALUES (?, ?, ?, ?, ?)')
     .run(id, title, content || null, imageUrl || null, req.user.id);
   res.status(201).json({ message: 'News posted', newsId: id });
 });
