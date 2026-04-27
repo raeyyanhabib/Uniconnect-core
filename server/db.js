@@ -31,17 +31,17 @@ module.exports = {
     const database = getDb();
     return database.exec(sql);
   },
-  run: (sql, params) => {
+  run: (sql, ...params) => {
     const database = getDb();
-    return database.run(sql, params);
+    return database.run(sql, ...params);
   },
-  all: (sql, params) => {
+  all: (sql, ...params) => {
     const database = getDb();
-    return database.all(sql, params);
+    return database.all(sql, ...params);
   },
-  get: (sql, params) => {
+  get: (sql, ...params) => {
     const database = getDb();
-    return database.get(sql, params);
+    return database.get(sql, ...params);
   },
   transaction: (fn) => {
     const database = getDb();

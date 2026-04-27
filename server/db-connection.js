@@ -100,32 +100,42 @@ function translateSql(sql) {
   return sql.replace(/\?/g, () => `$${index++}`);
 }
 
+// Helper to normalize parameters for PostgreSQL
+function normalizeParams(args) {
+  if (args.length === 0) return [];
+  if (args.length === 1) {
+    if (Array.isArray(args[0])) return args[0];
+    if (typeof args[0] === 'object' && args[0] !== null) return Object.values(args[0]);
+  }
+  return args;
+}
+
 // PostgreSQL adapter - mimics SQLite API
 function createPostgresAdapter() {
   return {
     prepare: (sql) => {
       const translated = translateSql(sql);
       return {
-        run: async (params) => {
+        run: async (...args) => {
           try {
-            const p = Array.isArray(params) ? params : Object.values(params || {});
+            const p = normalizeParams(args);
             return await pool.query(translated, p);
           } catch (error) {
             throw error;
           }
         },
-        get: async (params) => {
+        get: async (...args) => {
           try {
-            const p = Array.isArray(params) ? params : Object.values(params || {});
+            const p = normalizeParams(args);
             const result = await pool.query(translated, p);
             return result.rows[0];
           } catch (error) {
             throw error;
           }
         },
-        all: async (params) => {
+        all: async (...args) => {
           try {
-            const p = Array.isArray(params) ? params : Object.values(params || {});
+            const p = normalizeParams(args);
             const result = await pool.query(translated, p);
             return result.rows;
           } catch (error) {
@@ -141,26 +151,26 @@ function createPostgresAdapter() {
         throw error;
       }
     },
-    run: async (sql, params) => {
+    run: async (sql, ...args) => {
       try {
-        const p = Array.isArray(params) ? params : Object.values(params || {});
+        const p = normalizeParams(args);
         return await pool.query(translateSql(sql), p);
       } catch (error) {
         throw error;
       }
     },
-    get: async (sql, params) => {
+    get: async (sql, ...args) => {
       try {
-        const p = Array.isArray(params) ? params : Object.values(params || {});
+        const p = normalizeParams(args);
         const result = await pool.query(translateSql(sql), p);
         return result.rows[0];
       } catch (error) {
         throw error;
       }
     },
-    all: async (sql, params) => {
+    all: async (sql, ...args) => {
       try {
-        const p = Array.isArray(params) ? params : Object.values(params || {});
+        const p = normalizeParams(args);
         const result = await pool.query(translateSql(sql), p);
         return result.rows;
       } catch (error) {
