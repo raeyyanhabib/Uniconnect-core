@@ -1,5 +1,7 @@
 const path = require('path');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 let db = null;
 let pool = null;
@@ -15,6 +17,10 @@ async function initializeDatabase() {
                              process.env.POSTGRES_URL_NON_POOLING ||
                              process.env.POSTGRES_PRISMA_URL;
                              
+    if (!connectionString) {
+      console.error('CRITICAL: No PostgreSQL connection string found in environment variables!');
+    }
+
     pool = new Pool({
       connectionString,
       max: 10,
@@ -26,16 +32,11 @@ async function initializeDatabase() {
     // Create pool
     try {
       console.log('Connecting to PostgreSQL...');
-      if (!connectionString) {
-        throw new Error('DATABASE_URL is missing! Please connect Vercel Postgres in the Storage tab.');
-      }
-      
-      // Verification query to ensure connection is live
-      await pool.query('SELECT NOW()');
-      console.log('PostgreSQL connection established');
+      // Verification query
+      const ver = await pool.query('SELECT NOW()');
+      console.log('PostgreSQL connection established at:', ver.rows[0].now);
     } catch (error) {
       console.error('DATABASE CONNECTION ERROR:', error.message);
-      // Don't throw here, let the adapter handle it or fail gracefully later
     }
 
     return createPostgresAdapter();
