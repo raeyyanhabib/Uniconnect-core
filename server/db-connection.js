@@ -1,6 +1,3 @@
-// db-connection.js — Database abstraction layer supporting both SQLite and PostgreSQL
-const Database = require('better-sqlite3');
-const { Pool } = require('pg');
 const path = require('path');
 require('dotenv').config();
 
@@ -11,12 +8,14 @@ const dbType = process.env.DB_TYPE || 'sqlite';
 // Initialize connection based on DB_TYPE
 async function initializeDatabase() {
   if (dbType === 'postgres') {
+    const { Pool } = require('pg');
     // PostgreSQL initialization
     pool = new Pool({
       connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      max: 10, // Reduced for serverless
+      ssl: {
+        rejectUnauthorized: false // Required for some cloud providers
+      }
     });
 
     // Create schema on first run
@@ -27,14 +26,20 @@ async function initializeDatabase() {
       }
       
       const fs = require('fs');
-      const schemaPath = path.join(__dirname, 'schema.sql');
-      if (!fs.existsSync(schemaPath)) {
-        throw new Error(`Schema file not found at ${schemaPath}`);
+      const schemaPath = path.join(process.cwd(), 'server', 'schema.sql');
+      const alternatePath = path.join(__dirname, 'schema.sql');
+      
+      let schema;
+      if (fs.existsSync(schemaPath)) {
+        schema = fs.readFileSync(schemaPath, 'utf8');
+      } else if (fs.existsSync(alternatePath)) {
+        schema = fs.readFileSync(alternatePath, 'utf8');
+      } else {
+        console.warn('Schema file not found, skipping auto-init. Please run migrations manually.');
+        return createPostgresAdapter();
       }
       
-      const schema = fs.readFileSync(schemaPath, 'utf8');
       const statements = schema.split(';').filter(s => s.trim());
-      
       for (const statement of statements) {
         if (statement.trim()) {
           await pool.query(statement);
@@ -43,13 +48,13 @@ async function initializeDatabase() {
       console.log('PostgreSQL database ready and schema verified');
     } catch (error) {
       console.error('CRITICAL DATABASE ERROR:', error.message);
-      if (error.code) console.error('Error Code:', error.code);
       throw error;
     }
 
     return createPostgresAdapter();
   } else {
-    // SQLite initialization
+    // SQLite initialization - only loaded locally
+    const Database = require('better-sqlite3');
     db = new Database(path.join(__dirname, 'uniconnect.db'));
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON');
