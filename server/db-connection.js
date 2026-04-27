@@ -10,11 +10,16 @@ async function initializeDatabase() {
   if (dbType === 'postgres') {
     const { Pool } = require('pg');
     // PostgreSQL initialization
+    const connectionString = process.env.DATABASE_URL || 
+                             process.env.POSTGRES_URL || 
+                             process.env.POSTGRES_URL_NON_POOLING ||
+                             process.env.POSTGRES_PRISMA_URL;
+                             
     pool = new Pool({
-      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING,
-      max: 10, // Reduced for serverless
+      connectionString,
+      max: 10,
       ssl: {
-        rejectUnauthorized: false // Required for some cloud providers
+        rejectUnauthorized: false
       }
     });
 
