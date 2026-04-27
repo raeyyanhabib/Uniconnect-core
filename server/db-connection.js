@@ -18,37 +18,19 @@ async function initializeDatabase() {
       }
     });
 
-    // Create schema on first run
+    // Create pool
     try {
       console.log('Connecting to PostgreSQL...');
       if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL_NON_POOLING) {
         throw new Error('DATABASE_URL is missing! Please connect Vercel Postgres in the Storage tab.');
       }
       
-      const fs = require('fs');
-      const schemaPath = path.join(process.cwd(), 'server', 'schema.sql');
-      const alternatePath = path.join(__dirname, 'schema.sql');
-      
-      let schema;
-      if (fs.existsSync(schemaPath)) {
-        schema = fs.readFileSync(schemaPath, 'utf8');
-      } else if (fs.existsSync(alternatePath)) {
-        schema = fs.readFileSync(alternatePath, 'utf8');
-      } else {
-        console.warn('Schema file not found, skipping auto-init. Please run migrations manually.');
-        return createPostgresAdapter();
-      }
-      
-      const statements = schema.split(';').filter(s => s.trim());
-      for (const statement of statements) {
-        if (statement.trim()) {
-          await pool.query(statement);
-        }
-      }
-      console.log('PostgreSQL database ready and schema verified');
+      // Verification query to ensure connection is live
+      await pool.query('SELECT NOW()');
+      console.log('PostgreSQL connection established');
     } catch (error) {
-      console.error('CRITICAL DATABASE ERROR:', error.message);
-      throw error;
+      console.error('DATABASE CONNECTION ERROR:', error.message);
+      // Don't throw here, let the adapter handle it or fail gracefully later
     }
 
     return createPostgresAdapter();
