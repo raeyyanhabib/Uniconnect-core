@@ -26,7 +26,7 @@ async function initializeDatabase() {
     // Create pool
     try {
       console.log('Connecting to PostgreSQL...');
-      if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL_NON_POOLING) {
+      if (!connectionString) {
         throw new Error('DATABASE_URL is missing! Please connect Vercel Postgres in the Storage tab.');
       }
       
