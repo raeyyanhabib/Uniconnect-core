@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect — Complete Technical Guide (Vercel + Postgres Edition)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0B1120;
+      --bg2: #0F172A;
+      --surface: #1E293B;
+      --card: #1E293B;
+      --border: rgba(255,255,255,0.08);
+      --border-lt: rgba(255,255,255,0.12);
+      --cyan: #3B82F6;
+      --cyan-lt: #60A5FA;
+      --cyan-dk: #2563EB;
+      --amber: #F59E0B;
+      --green: #10B981;
+      --red: #EF4444;
+      --purple: #6366F1;
+      --pink: #EC4899;
+      --tx: #F8FAFC;
+      --tx-s: #CBD5E1;
+      --tx-m: #94A3B8;
+      --radius: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 4px; }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 60vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 70%, rgba(99,102,241,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 40px; padding: 6px 18px 6px 8px;
+      font-size: 12px; font-weight: 600; color: var(--cyan-lt);
+      margin-bottom: 28px; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 62px); font-weight: 900;
+      background: linear-gradient(135deg, var(--cyan-lt), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 16px; line-height: 1.15;
+    }
+    .hero h1 span { color: var(--green); }
+    .hero p { font-size: 18px; color: var(--tx-m); max-width: 620px; }
+
+    /* ── Layout ── */
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Table of Contents ── */
+    .toc {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px 40px;
+      margin-bottom: 60px;
+    }
+    .toc h2 {
+      font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--tx-m); margin-bottom: 20px;
+    }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; }
+    .toc a {
+      color: var(--tx-s); text-decoration: none; font-size: 14px; font-weight: 500;
+      padding: 8px 0; display: flex; align-items: center; gap: 10px;
+      transition: color 0.2s;
+    }
+    .toc a:hover { color: var(--cyan-lt); }
+    .toc a .num {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+      color: var(--cyan); background: rgba(59,130,246,0.1); border-radius: 6px;
+      padding: 2px 7px;
+    }
+
+    /* ── Section ── */
+    section { margin-bottom: 72px; }
+    section > h2 {
+      font-size: 28px; font-weight: 800; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    section > h2 .tag {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      background: rgba(59,130,246,0.12); color: var(--cyan-lt); border-radius: 6px;
+      padding: 3px 10px;
+    }
+    section > .subtitle { color: var(--tx-m); font-size: 15px; margin-bottom: 32px; }
+
+    /* ── Tech Cards ── */
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .tech-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px; transition: border-color 0.3s, transform 0.2s;
+    }
+    .tech-card:hover { border-color: var(--border-lt); transform: translateY(-2px); }
+    .tech-card .icon-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    }
+    .tech-card .icon-box {
+      width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; flex-shrink: 0;
+    }
+    .tech-card h3 { font-size: 17px; font-weight: 700; }
+    .tech-card .role {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--tx-m); margin-top: 2px;
+    }
+    .tech-card p { font-size: 14px; color: var(--tx-s); line-height: 1.7; }
+    .tech-card .why {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--tx-m);
+    }
+    .tech-card .why strong { color: var(--cyan-lt); }
+
+    /* ── File Tree ── */
+    .file-section { margin-bottom: 40px; }
+    .file-section h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 14px;
+      padding-left: 14px; border-left: 3px solid var(--cyan);
+    }
+    .file-list { display: flex; flex-direction: column; gap: 12px; }
+    .file-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; transition: border-color 0.3s;
+    }
+    .file-item:hover { border-color: var(--border-lt); }
+    .file-item .file-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;
+    }
+    .file-item .filename {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+      color: var(--cyan-lt);
+    }
+    .file-item .file-tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+      padding: 2px 8px; border-radius: 5px;
+    }
+    .tag-page { background: rgba(99,102,241,0.12); color: var(--purple); }
+    .tag-component { background: rgba(16,185,129,0.12); color: var(--green); }
+    .tag-service { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .tag-config { background: rgba(236,72,153,0.12); color: var(--pink); }
+    .tag-route { background: rgba(59,130,246,0.12); color: var(--cyan); }
+    .tag-middleware { background: rgba(239,68,68,0.12); color: var(--red); }
+    .tag-data { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .tag-style { background: rgba(236,72,153,0.12); color: var(--pink); }
+
+    .file-item p { font-size: 13px; color: var(--tx-s); line-height: 1.65; }
+    .file-item code {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      background: rgba(59,130,246,0.08); color: var(--cyan-lt);
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ── Dependency Table ── */
+    .dep-table-wrap {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 24px;
+    }
+    .dep-table-wrap h4 {
+      font-size: 14px; font-weight: 700; padding: 16px 24px; background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--tx-m); padding: 12px 24px;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 24px; font-size: 13.5px; color: var(--tx-s);
+      border-bottom: 1px solid var(--border);
+    }
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--cyan-lt); font-weight: 500;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Diagram ── */
+    .diagram-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px; margin-bottom: 32px; text-align: center;
+    }
+    .diagram-card h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--tx-m); margin-bottom: 24px; }
+    .flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+    .flow-node {
+      padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: var(--tx-m); font-size: 20px; padding: 0 8px; }
+    .fn-browser { background: rgba(99,102,241,0.15); color: var(--purple); border: 1px solid rgba(99,102,241,0.25); }
+    .fn-vite { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+    .fn-react { background: rgba(59,130,246,0.15); color: var(--cyan-lt); border: 1px solid rgba(59,130,246,0.25); }
+    .fn-vercel { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+    .fn-express { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+    .fn-db { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+
+    /* ── Schema Cards ── */
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .schema-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .schema-card h4 {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+      color: var(--amber); margin-bottom: 10px;
+    }
+    .schema-card ul { list-style: none; }
+    .schema-card li {
+      font-size: 12.5px; color: var(--tx-s); padding: 3px 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .schema-card li .col-name { color: var(--cyan-lt); }
+    .schema-card li .col-type { color: var(--tx-m); }
+
+    /* ── Callout ── */
+    .callout {
+      border-radius: 14px; padding: 20px 24px; margin-bottom: 28px;
+      display: flex; align-items: flex-start; gap: 14px;
+      font-size: 14px; line-height: 1.65;
+    }
+    .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .callout-blue { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18); color: var(--tx-s); }
+    .callout-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.18); color: var(--tx-s); }
+    .callout-amber { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.18); color: var(--tx-s); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 24px; text-align: center; border-top: 1px solid var(--border);
+      color: var(--tx-m); font-size: 13px; margin-top: 40px;
+    }
+    footer span { color: var(--cyan-lt); font-weight: 600; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .tech-grid, .toc-grid, .schema-grid { grid-template-columns: 1fr; }
+      .flow { flex-direction: column; gap: 6px; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<header class="hero">
+  <div class="hero-badge"><span class="dot"></span> Technical Reference Guide (Updated Edition)</div>
+  <h1>UniConnect</h1>
+  <p>A complete, line-by-line technical breakdown of every technology, file, and dependency powering the UniConnect campus platform, including our new dual SQLite + PostgreSQL deployment pipeline.</p>
+</header>
+
+<div class="container">
+
+<!-- ═══════════════════════ TOC ═══════════════════════ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#tech"><span class="num">01</span> The Technology Stack</a>
+    <a href="#how"><span class="num">02</span> How It All Connects (Vercel Ready)</a>
+    <a href="#frontend-files"><span class="num">03</span> Frontend Files Breakdown</a>
+    <a href="#backend-files"><span class="num">04</span> Backend Files & DB Abstraction</a>
+    <a href="#database"><span class="num">05</span> The Database Schema</a>
+    <a href="#config"><span class="num">06</span> Configuration & Deployment Files</a>
+    <a href="#deps"><span class="num">07</span> Every Single Dependency</a>
+    <a href="#glossary"><span class="num">08</span> Glossary of Terms</a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════ SECTION 1: TECH STACK ═══════════════════════ -->
+<section id="tech">
+  <h2>The Technology Stack <span class="tag">Fundamentals</span></h2>
+  <p class="subtitle">Every tool, language, and framework used in UniConnect — what it is, what it does, and why we chose it.</p>
+
+  <div class="tech-grid">
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(59,130,246,0.15);color:var(--cyan);">⚛</div>
+        <div><h3>React & TypeScript</h3><div class="role">Frontend Architecture</div></div>
+      </div>
+      <p>React builds your app out of small, reusable "components" (like a button, a card, or an entire page). When data changes, React re-renders only the affected parts. We pair this with TypeScript to strictly type all data shapes (e.g., ensuring a User always has an email and name). This catches bugs before they even hit the browser.</p>
+      <div class="why"><strong>Why we use it:</strong> Modular scaling for a massive 17-page application, with rock-solid type safety.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(245,158,11,0.15);color:var(--amber);">⚡</div>
+        <div><h3>Vite</h3><div class="role">Build Tool & Dev Server</div></div>
+      </div>
+      <p>Vite powers our local development. It runs a local web server with Hot Module Replacement (HMR) to instantly refresh your browser when you save a file. For production, Vite optimally bundles all React code into lightweight, minified assets that run fast in any browser.</p>
+      <div class="why"><strong>Why we use it:</strong> Lightning-fast compilation. Changes appear in &lt;100ms.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(16,185,129,0.15);color:var(--green);">Ex</div>
+        <div><h3>Express.js & Node</h3><div class="role">Backend Server</div></div>
+      </div>
+      <p>Node.js runs Javascript outside the browser. Express is our minimal framework on top of Node. It intercepts HTTP requests from the frontend, queries our database, and returns the response as JSON. It serves as the bridge between your UI and your persistent data.</p>
+      <div class="why"><strong>Why we use it:</strong> One language (JavaScript) used uniformly across the entire stack.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(99,102,241,0.15);color:var(--purple);">🗄</div>
+        <div><h3>PostgreSQL & SQLite</h3><div class="role">Dual Database Architecture</div></div>
+      </div>
+      <p>We use a dual-database approach via a custom abstraction layer. Locally, we use <strong>SQLite</strong> for instant, zero-config development. In production on Vercel, the app automatically seamlessly switches to <strong>PostgreSQL</strong> via connection pooling. The same SQL queries execute natively on both.</p>
+      <div class="why"><strong>Why we use it:</strong> The best of both worlds. Zero friction locally, but robust scalability for live deployment on Vercel.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(59,130,246,0.15);color:var(--cyan);">🔑</div>
+        <div><h3>JWT (JSON Web Tokens)</h3><div class="role">Authentication System</div></div>
+      </div>
+      <p>JWT handles login sessions statelessly. When a user logs in, the server creates a signed token containing their ID. This token is stored in the browser's <code>localStorage</code> and passed along with every API call. If the token is valid, the server processes the request.</p>
+      <div class="why"><strong>Why we use it:</strong> Stateless authentication means our server doesn't have to remember who's logged in, drastically reducing memory usage and making Vercel serverless deployment easy.</div>
+    </div>
+
+    <div class="tech-card">
+      <div class="icon-row">
+        <div class="icon-box" style="background:rgba(236,72,153,0.15);color:var(--pink);">☁️</div>
+        <div><h3>Vercel</h3><div class="role">Cloud Deployment Host</div></div>
+      </div>
+      <p>Vercel is the cloud platform that hosts the live UniConnect platform. It serves the static React frontend from a global CDN and executes our Express backend API dynamically via serverless functions (configured in <code>vercel.json</code>). It also provides the cloud PostgreSQL database.</p>
+      <div class="why"><strong>Why we use it:</strong> Auto-scaling, free SSL, CI/CD out of the box, and native Postgres support.</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 2: HOW IT CONNECTS ═══════════════════════ -->
+<section id="how">
+  <h2>How It All Connects <span class="tag">Architecture</span></h2>
+  <p class="subtitle">The complete request lifecycle — how local proxying differs from Vercel deployment.</p>
+
+  <div class="diagram-card">
+    <h4>Local Development Request Flow</h4>
+    <div class="flow">
+      <div class="flow-node fn-browser">🖥 Browser</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-vite">⚡ Vite Dev Server<br><small>localhost:5173</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-react">🔀 Vite Proxy<br><small>/api/* forwards</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-express">📡 Express Server<br><small>localhost:3001</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-db">🗄 SQLite<br><small>uniconnect.db</small></div>
+    </div>
+  </div>
+
+  <div class="diagram-card">
+    <h4>Vercel Production Request Flow</h4>
+    <div class="flow">
+      <div class="flow-node fn-browser">🖥 Browser</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-vercel">☁️ Vercel CDN<br><small>Static React Files</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-express">⚡ Serverless Functions<br><small>Express backend endpoints</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node fn-db">🗄 Vercel Postgres<br><small>Cloud SQL Database</small></div>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">🔀</span>
+    <div>
+      <strong>How we handle both:</strong> In local development, the React frontend runs on port 5173, and Vite proxies <code>/api</code> requests to Express on port 3001. In production, <code>vercel.json</code> tells Vercel to route any <code>/api/(.*)</code> request directly to <code>server/index.js</code> via its serverless environment! 
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 3: FRONTEND FILES ═══════════════════════ -->
+<section id="frontend-files">
+  <h2>Frontend Files Breakdown <span class="tag">src/</span></h2>
+  <p class="subtitle">A quick review of the React frontend structure.</p>
+
+  <div class="file-section">
+    <h3>Core Logic & Entry</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">main.tsx & App.tsx</span>
+          <span class="file-tag tag-page">Master Entry</span>
+        </div>
+        <p><code>main.tsx</code> is the ignition key mounting the React DOM. <code>App.tsx</code> is the orchestrator managing <code>currentUser</code> state and dictating which view (Dashboard, Messages, Login, etc.) to show based on standard React state updates.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">src/services/api.ts</span>
+          <span class="file-tag tag-service">Service</span>
+        </div>
+        <p>The HTTP client. Every API call goes through this file. It automatically intercepts calls to inject the <code>Bearer</code> JWT token from localStorage into the headers.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <h3>Pages Directory <code>src/pages/</code></h3>
+    <p style="font-size: 14px; margin-bottom: 12px; color: var(--tx-s);">The application is split into exactly 17 dynamic pages managed by our master router. Key highlights:</p>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Auth Pages (Login, Register, Verify)</span>
+          <span class="file-tag tag-page">Auth</span>
+        </div>
+        <p>Handles the entire identity pipeline. <code>RegisterPage</code> validates university emails, <code>VerifyStudentPage</code> adds extra institutional verification.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">ResourcesPage.tsx</span>
+          <span class="file-tag tag-page">App Page</span>
+        </div>
+        <p>The marketplace engine. Allows borrowing, lending, approving requests, tracking handovers, and filing disputes.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">Admin Pages (Dashboard, Users, Resources, Reports)</span>
+          <span class="file-tag tag-page">Admin View</span>
+        </div>
+        <p>Protected components only available to admin accounts. Used for moderating the ecosystem, blocking rule-breakers, and evaluating platform metrics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 4: BACKEND FILES ═══════════════════════ -->
+<section id="backend-files">
+  <h2>Backend Files & DB Abstraction <span class="tag">server/</span></h2>
+  <p class="subtitle">The Express API with our new universal Database layer.</p>
+
+  <div class="file-section">
+    <h3>The Database Abstraction Layer</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">db-connection.js</span>
+          <span class="file-tag tag-data">Database Layer</span>
+        </div>
+        <p><strong>The secret sauce for Vercel deployment.</strong> Reads <code>process.env.DB_TYPE</code>. If it equals <code>postgres</code>, it boots up the <code>pg</code> Pool and creates an adapter that perfectly mimics SQLite's <code>.get()</code>, <code>.run()</code>, and <code>.all()</code> API. This means zero routing logic has to change when moving to the cloud.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">schema.sql</span>
+          <span class="file-tag tag-data">Schema Definitions</span>
+        </div>
+        <p>A unified SQL file defining all 12 tables. The system reads this file dynamically on boot to ensure the database (whether SQLite or Postgres) has the correct table structures.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">db.js</span>
+          <span class="file-tag tag-data">Legacy Export Bridge</span>
+        </div>
+        <p>Our endpoints still `require('./db')`. This file now just imports from `db-connection.js` and waits for it to initialize, exporting standard database verbs to keep backwards compatibility.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <h3>Migration & Safety Scripts</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">migrate-data.js</span>
+          <span class="file-tag tag-config">Script</span>
+        </div>
+        <p>Reads every single row from your local `uniconnect.db` SQLite file and meticulously inserts it into the active PostgreSQL connection. Ensures zero data loss when moving from local dev to Vercel production.</p>
+      </div>
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">rollback-migration.js</span>
+          <span class="file-tag tag-config">Script</span>
+        </div>
+        <p>A safety valve. Safely truncates and cascades data deletions in the PostgreSQL database if a migration errors out or needs to be wiped clean.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <h3>Express Routing Logic</h3>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-head">
+          <span class="filename">index.js</span>
+          <span class="file-tag tag-config">Server Entry</span>
+        </div>
+        <p>Mounts all routes (auth, users, partners, groups, resources, messages, etc) under <code>/api</code>. Initializes middleware to verify JWTs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 5: DATABASE ═══════════════════════ -->
+<section id="database">
+  <h2>The Database Schema <span class="tag">SQL Tables</span></h2>
+  <p class="subtitle">The 12 tables structuring the UniConnect ecosystem, fully compatible with Postgres & SQLite.</p>
+
+  <div class="schema-grid">
+    <div class="schema-card">
+      <h4>Users</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">name</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">email</span> <span class="col-type">TEXT UNIQUE</span></li>
+        <li><span class="col-name">passwordHash</span> <span class="col-type">TEXT</span></li>
+        <li><span class="col-name">role</span> <span class="col-type">DEFAULT 'student'</span></li>
+        <li><span class="col-name">avgRating</span> <span class="col-type">REAL DEFAULT 0</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>PartnerRequests</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">fromId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">toId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'pending'</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>StudyGroups</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">name</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">creatorId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>GroupMembers</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">userId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">groupId</span> <span class="col-type">→ StudyGroups(id)</span></li>
+        <li style="color:var(--tx-m); font-style:italic">UNIQUE(userId, groupId)</li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Resources</h4>
+      <ul>
+        <li><span class="col-name">id</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">title</span> <span class="col-type">TEXT NOT NULL</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'available'</span></li>
+        <li><span class="col-name">ownerId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>BorrowRequests & Transactions</h4>
+      <ul>
+        <li style="color:var(--amber); font-weight:600">BorrowRequests:</li>
+        <li><span class="col-name">resourceId</span> <span class="col-type">→ Resources(id)</span></li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'pending'</span></li>
+        <li style="color:var(--amber); font-weight:600; margin-top:8px">Transactions:</li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'active'</span></li>
+        <li><span class="col-name">rating</span> <span class="col-type">INTEGER</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Conversations & Messages</h4>
+      <ul>
+        <li><span class="col-name">convId</span> <span class="col-type">TEXT PK</span></li>
+        <li><span class="col-name">user1Id / user2Id</span> <span class="col-type">→ Users(id)</span></li>
+        <li style="color:var(--amber); font-weight:600; margin-top:8px">Messages:</li>
+        <li><span class="col-name">senderId</span> <span class="col-type">→ Users(id)</span></li>
+        <li><span class="col-name">text</span> <span class="col-type">TEXT</span></li>
+      </ul>
+    </div>
+    <div class="schema-card">
+      <h4>Notifications & LostFound</h4>
+      <ul>
+        <li style="color:var(--amber); font-weight:600">Notifications:</li>
+        <li><span class="col-name">content / type</span> <span class="col-type">TEXT</span></li>
+        <li style="color:var(--amber); font-weight:600; margin-top:8px">LostFound:</li>
+        <li><span class="col-name">status</span> <span class="col-type">DEFAULT 'open'</span></li>
+        <li><span class="col-name">reporterId</span> <span class="col-type">→ Users(id)</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 6: CONFIG ═══════════════════════ -->
+<section id="config">
+  <h2>Configuration & Deployment Files <span class="tag">Root</span></h2>
+  <p class="subtitle">The new files added to manage Vercel deployments and dynamic configurations.</p>
+
+  <div class="file-list">
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">vercel.json</span>
+        <span class="file-tag tag-config">Deployment</span>
+      </div>
+      <p>Instructs Vercel precisely how to build and host our app. It maps <code>/api/(.*)</code> to our Express Node.js environment via <code>@vercel/node</code>, while serving our built Vite assets from the root. Sets the default <code>DB_TYPE</code> environment variable for production to <code>postgres</code>.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">server/.env.example & server/.env.production</span>
+        <span class="file-tag tag-config">Env Setup</span>
+      </div>
+      <p>We rely on `.env` files to dictate the database mode. Locally, `DB_TYPE=sqlite` skips Postgres usage. In Vercel, `DB_TYPE=postgres` is used alongside the auto-injected `DATABASE_URL`.</p>
+    </div>
+    <div class="file-item">
+      <div class="file-head">
+        <span class="filename">package.json</span>
+        <span class="file-tag tag-config">Config</span>
+      </div>
+      <p>Now contains custom `npm run migrate` and `npm run rollback` commands to trigger our custom database bridging scripts.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 7: DEPENDENCIES ═══════════════════════ -->
+<section id="deps">
+  <h2>Every Single Dependency <span class="tag">package.json</span></h2>
+  <p class="subtitle">A full view of the dependencies, newly updated for PostgreSQL support.</p>
+
+  <div class="dep-table-wrap">
+    <h4>📡 Backend Dependencies (server/package.json)</h4>
+    <table>
+      <thead><tr><th>Package</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>pg & pg-pool</td><td><span class="tag" style="background:var(--cyan);color:white;padding:2px 6px;border-radius:4px;font-size:10px;">NEW</span> The official Node.js PostgreSQL clients. `pg-pool` manages multiple concurrent connections to the database efficiently in a serverless environment like Vercel.</td></tr>
+        <tr><td>better-sqlite3</td><td>The lightning fast local SQLite engine, used locally when `DB_TYPE` is not `postgres`.</td></tr>
+        <tr><td>express</td><td>The web server framework. Provides routing and API bridging for React.</td></tr>
+        <tr><td>bcryptjs</td><td>Hashes and verifies passwords via the bcrypt algorithm with embedded salts.</td></tr>
+        <tr><td>jsonwebtoken</td><td>Creates and signs JWTs used for maintaining secure stateless user sessions.</td></tr>
+        <tr><td>cors & dotenv</td><td>Allows the frontend to hit the backend without origin blocks, and loads variables from `.env` files respectively.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="dep-table-wrap">
+    <h4>🖥 Frontend Dependencies</h4>
+    <table>
+      <thead><tr><th>Package</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>react & react-dom</td><td>The core component rendering libraries shaping the entire user interface.</td></tr>
+        <tr><td>lucide-react</td><td>The icon suite utilized across all buttons, status badges, and empty states.</td></tr>
+        <tr><td>vite & plugins</td><td>Our core dev-server, proxy-host, and production packager for the UI.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SECTION 8: GLOSSARY ═══════════════════════ -->
+<section id="glossary">
+  <h2>Glossary of Terms <span class="tag">Reference</span></h2>
+  <p class="subtitle">Quick definitions for terms you'll encounter throughout the codebase.</p>
+
+  <div class="dep-table-wrap">
+    <table>
+      <thead><tr><th style="width:180px">Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>Serverless</td><td>Vercel's approach to Node apps: The Express backend boots up in milliseconds only when an API call is made, and shuts down immediately, saving cloud costs.</td></tr>
+        <tr><td>Connection Pooling</td><td>Because Vercel serverless functions boot rapidly, we use `pg-pool` to manage the connections to Postgres safely so the database isn't overwhelmed.</td></tr>
+        <tr><td>Component</td><td>A reusable piece of UI in React. Can be as small as a button or as large as an entire page.</td></tr>
+        <tr><td>State</td><td>Data that changes over time within a component. Managed with <code>useState()</code>. React auto-updates when state changes.</td></tr>
+        <tr><td>REST API</td><td>An architectural style for APIs. Uses GET (read), POST (create), PUT (update), DELETE (remove).</td></tr>
+        <tr><td>HMR</td><td>Hot Module Replacement. Vite updates only the changed module in the browser without a full reload.</td></tr>
+        <tr><td>JWT</td><td>An encoded string containing user data signed with a secret key. Proves identity statelessly.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>UniConnect Technical Guide — Built for <span>sda-uniconnect</span> · Last updated 2026</p>
+</footer>
+
+</body>
+</html>
