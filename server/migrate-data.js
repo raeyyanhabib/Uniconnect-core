@@ -77,6 +77,18 @@ async function runMigration() {
   console.log('Starting data migration from SQLite to PostgreSQL...\n');
   
   try {
+    // 0. Initialize Schema (Create Tables)
+    console.log('Initializing PostgreSQL schema...');
+    const fs = require('fs');
+    const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+    const statements = schema.split(';').filter(s => s.trim());
+    for (const statement of statements) {
+      if (statement.trim()) {
+        await targetPool.query(statement);
+      }
+    }
+    console.log('  ✓ Tables created successfully\n');
+
     // Disable foreign key checks temporarily
     await targetPool.query('SET CONSTRAINTS ALL DEFERRED');
     

@@ -94,22 +94,30 @@ function createSQLiteAdapter() {
   };
 }
 
+// Helper to translate '?' placeholders to '$1, $2, ...' for PostgreSQL
+function translateSql(sql) {
+  let index = 1;
+  return sql.replace(/\?/g, () => `$${index++}`);
+}
+
 // PostgreSQL adapter - mimics SQLite API
 function createPostgresAdapter() {
   return {
     prepare: (sql) => {
+      const translated = translateSql(sql);
       return {
-        run: (params) => {
+        run: async (params) => {
           try {
-            const result = pool.query(sql, Object.values(params || {}));
-            return result;
+            const p = Array.isArray(params) ? params : Object.values(params || {});
+            return await pool.query(translated, p);
           } catch (error) {
             throw error;
           }
         },
         get: async (params) => {
           try {
-            const result = await pool.query(sql, Object.values(params || {}));
+            const p = Array.isArray(params) ? params : Object.values(params || {});
+            const result = await pool.query(translated, p);
             return result.rows[0];
           } catch (error) {
             throw error;
@@ -117,7 +125,8 @@ function createPostgresAdapter() {
         },
         all: async (params) => {
           try {
-            const result = await pool.query(sql, Object.values(params || {}));
+            const p = Array.isArray(params) ? params : Object.values(params || {});
+            const result = await pool.query(translated, p);
             return result.rows;
           } catch (error) {
             throw error;
@@ -134,15 +143,16 @@ function createPostgresAdapter() {
     },
     run: async (sql, params) => {
       try {
-        const result = await pool.query(sql, Object.values(params || {}));
-        return result;
+        const p = Array.isArray(params) ? params : Object.values(params || {});
+        return await pool.query(translateSql(sql), p);
       } catch (error) {
         throw error;
       }
     },
     get: async (sql, params) => {
       try {
-        const result = await pool.query(sql, Object.values(params || {}));
+        const p = Array.isArray(params) ? params : Object.values(params || {});
+        const result = await pool.query(translateSql(sql), p);
         return result.rows[0];
       } catch (error) {
         throw error;
@@ -150,10 +160,25 @@ function createPostgresAdapter() {
     },
     all: async (sql, params) => {
       try {
-        const result = await pool.query(sql, Object.values(params || {}));
+        const p = Array.isArray(params) ? params : Object.values(params || {});
+        const result = await pool.query(translateSql(sql), p);
         return result.rows;
       } catch (error) {
         throw error;
+      }
+    },
+    transaction: async (fn) => {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await fn();
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
       }
     },
     close: async () => {
