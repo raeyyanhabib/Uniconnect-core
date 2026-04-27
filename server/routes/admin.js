@@ -66,8 +66,23 @@ router.get('/resources', (req, res) => {
 
 // UC 33 — Remove a resource (admin)
 router.delete('/resources/:id', (req, res) => {
-  db.prepare('DELETE FROM Resources WHERE id = ?').run(req.params.id);
-  res.json({ message: 'Resource removed' });
+  const resourceId = req.params.id;
+  
+  // Start a transaction to ensure atomic deletion
+  const deleteTx = db.transaction(() => {
+    // Delete dependent records first to satisfy foreign key constraints
+    db.prepare('DELETE FROM BorrowRequests WHERE resourceId = ?').run(resourceId);
+    db.prepare('DELETE FROM Transactions WHERE resourceId = ?').run(resourceId);
+    db.prepare('DELETE FROM Resources WHERE id = ?').run(resourceId);
+  });
+
+  try {
+    deleteTx();
+    res.json({ message: 'Resource and all related records removed' });
+  } catch (err) {
+    console.error('Failed to delete resource:', err);
+    res.status(500).json({ error: 'Failed to delete resource' });
+  }
 });
 
 // UC 34 — List platform reports

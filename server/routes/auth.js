@@ -11,7 +11,6 @@ const { SECRET, authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-
 // Quick UUID generator for creating new user IDs
 function uuid() {
   return crypto.randomUUID();
