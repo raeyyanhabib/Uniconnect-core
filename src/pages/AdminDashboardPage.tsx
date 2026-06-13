@@ -15,10 +15,10 @@ export default function AdminDashboardPage({ onNavigate }: AdminDashboardPagePro
   }, []);
 
   const stats = [
-    { label: "Total Users", value: data ? data.totalUsers : "-", icon: Users, color: C.cyan, sub: `${data ? data.activeUsers : "-"} active` },
-    { label: "Active Loans", value: data ? data.activeLoans : "-", icon: Package, color: C.amber, sub: `${data ? data.overdueLoans : "-"} overdue` },
+    { label: "Total Users", value: data ? data.totalUsers : "-", icon: Users, color: C.cyan, sub: `${data ? data.activeUsers : "-"} active`, onClick: () => onNavigate("adminUsers") },
+    { label: "Active Loans", value: data ? data.activeLoans : "-", icon: Package, color: C.amber, sub: `${data ? data.overdueLoans : "-"} overdue`, onClick: () => onNavigate("adminResources") },
     { label: "Study Groups", value: data ? data.totalGroups : "-", icon: Layers, color: C.purple, sub: `${data ? data.totalResources : "-"} listings` },
-    { label: "Pending Reports", value: data ? data.pendingReports : "-", icon: Flag, color: C.red, sub: `${data ? data.lostItems : "-"} lost items` },
+    { label: "Pending Reports", value: data ? data.pendingReports : "-", icon: Flag, color: C.red, sub: `${data ? data.lostItems : "-"} lost items`, onClick: () => onNavigate("adminReports") },
   ];
 
   return (
@@ -34,9 +34,9 @@ export default function AdminDashboardPage({ onNavigate }: AdminDashboardPagePro
         <div style={cardStyle()}>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tx, margin: "0 0 16px" }}>Pending Actions</h3>
           {[
-            { label: "User reports awaiting review", count: 3, color: C.red, page: "adminReports" },
-            { label: "Flagged resource listings", count: 2, color: C.amber, page: "adminResources" },
-            { label: "Blocked user appeals", count: 1, color: C.purple, page: "adminUsers" },
+            { label: "User reports awaiting review", count: data ? data.pendingReports : 0, color: C.red, page: "adminReports" },
+            { label: "Flagged resource listings", count: data ? data.overdueLoans : 0, color: C.amber, page: "adminResources" },
+            { label: "Blocked user appeals", count: data ? data.blockedUsers : 0, color: C.purple, page: "adminUsers" },
           ].map(a => (
             <button key={a.label} onClick={() => onNavigate(a.page)}
               style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", padding: "11px 14px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, color: C.txS, cursor: "pointer", fontSize: 13, marginBottom: 8, textAlign: "left" }}>

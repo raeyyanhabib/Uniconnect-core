@@ -20,7 +20,11 @@ export default function AdminResourcesPage({ user: _user }: AdminResourcesPagePr
     try {
       await api.delete(`/api/admin/resources/${id}`);
       setRes(rs => rs.filter(r => r.id !== id));
-    } catch(err) { console.error(err); }
+      alert("Resource removed successfully.");
+    } catch(err) { 
+      console.error(err); 
+      alert("Failed to remove resource.");
+    }
   };
 
   return (

@@ -11,7 +11,6 @@ const { SECRET, authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-
 // Quick UUID generator for creating new user IDs
 function uuid() {
   return crypto.randomUUID();
@@ -138,7 +137,7 @@ router.post('/reset-password', (req, res) => {
 
 // Change password — lets a logged-in user update their password.
 // Requires the current password for verification, then hashes and stores the new one.
-// This is the real deal — it actually updates the password in the database.
+// This is da real deal — it actually updates the password in the database. (you da real deal)
 router.put('/change-password', authMiddleware, (req, res) => {
   const { currentPassword, newPassword } = req.body;
 

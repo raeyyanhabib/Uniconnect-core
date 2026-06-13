@@ -4,28 +4,19 @@ This document shows the main design patterns we used in this project.
 
 
 1. Singleton Pattern
-We used this in src/services/api.ts by exporting one single api object. This keeps all our backend calls consistent in one place.
+We used this in src/services/api.ts by exporting one single api object. This keeps all our backend calls consistent in one place. Every page in the app imports and uses the same api instance, so the JWT token is always read from the same source and all HTTP requests behave the same way.
 
 
-2. Observer Pattern
-We used this in App.tsx with the event listener for notifications. It lets different parts of the app talk to each other without being strictly linked.
+2. Factory Pattern
+We used this in server/db-connection.js. The createSQLiteAdapter() function is a factory function. It creates and returns a database adapter object without exposing how it is built internally. The rest of the app just calls initializeDatabase() and gets back a ready-to-use db object with methods like get, run, and prepare. The route files do not need to know the details of how the database connection works — they just use the object that the factory gives them.
 
 
-3. Component Pattern
-All our UI like Badge, Modal, and Avatar are built as reusable components. This keeps the design looking the same across all pages.
+3. MVC Pattern (Model - View - Controller)
+The whole project follows the MVC pattern, split across the frontend and backend.
 
+Model: The database tables defined in server/schema.sql (Users, Resources, Transactions, etc.) are the data layer. The route files query and update this data.
+View: The React pages and components in src/pages/ and src/components/ are the view layer. They display the data to the user and collect input.
+Controller: The Express route handlers in server/routes/ are the controllers. They receive requests from the frontend, apply business logic (like checking if a user is blocked or if a resource is available), query the Model, and send the response back to the View.
 
-4. Layout Pattern
-The AppShell in App.tsx wraps every page with the same Sidebar and TopBar.
-
-
-5. Strategy Pattern
-The pageLabels object in the TopBar helps pick the right title based on which page you are visiting.
-
-
-6. Polling Pattern
-We use setInterval in App.tsx and LostFoundPage.tsx to check for new messages or items every few seconds so it feels live.
-
-
-7. State Lifting
-We keep the main user and page info in App.tsx and pass it down to the other pages. This keeps the "truth" in one central spot.
+4. Observer Pattern
+We used this in App.tsx with setInterval polling for notifications and unread messages. App.tsx acts as the observer — it watches for changes by calling the notifications and messages API every 30 seconds. When the count changes, it automatically updates the sidebar badges across the whole app. The individual pages do not need to know this is happening. They just react when the shared state changes. This lets different parts of the app stay in sync without being directly connected to each other.

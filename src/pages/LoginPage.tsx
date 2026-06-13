@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BookOpen, Check, RefreshCw, Mail, Lock, Eye, Shield } from 'lucide-react';
+import React, { useState } from 'react';  // the main shit 
+import { BookOpen, Check, RefreshCw, Mail, Lock, Eye, Shield } from 'lucide-react'; // icons 
 import { C, inp, btnP, btnS } from '../services/theme';
 import { api, setToken } from '../services/api';
 import FormField from '../components/FormField';
@@ -30,7 +30,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
-      setLoading(false);
+      setLoading(false); // going to run regardless 
     }
   };
 
@@ -94,8 +94,7 @@ export default function LoginPage({ onLogin, onNavigate }: AuthPageProps) {
           </button>
 
           <button type="button" onClick={() => onNavigate("adminLogin")} style={{ ...btnS, width: "100%", justifyContent: "center", fontSize: 13 }}>
-            <Shield size={14} /> Admin Portal
-          </button>
+            <Shield size={14} /> Admin Portal </button>
 
           {/* Registration link */}
           <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 24, paddingTop: 20, textAlign: "center" }}>

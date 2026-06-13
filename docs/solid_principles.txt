@@ -1,6 +1,6 @@
 SOLID Principles in UniConnect
 
-This file explains how we used SOLID principles in the website.
+This file explains how we used SOLID principles in the project.
 
 
 1. Single Responsibility Principle (SRP)

@@ -21,8 +21,13 @@ export default function AdminUsersPage({ user: _user }: AdminUsersPageProps) {
   const toggleBlock = async (id: string) => {
     try {
       await api.put(`/api/admin/users/${id}/block`);
-      setUsers(us => us.map(u => u.id === id ? { ...u, status: u.status === "blocked" ? "active" : "blocked" } : u));
-    } catch (err) { console.error(err); }
+      const newStatus = users.find(u => u.id === id)?.status === "blocked" ? "active" : "blocked";
+      setUsers(us => us.map(u => u.id === id ? { ...u, status: newStatus } : u));
+      alert(`User ${newStatus === "blocked" ? "blocked" : "unblocked"} successfully.`);
+    } catch (err) { 
+      console.error(err); 
+      alert("Failed to update user status.");
+    }
   };
   
   const filtered = users.filter(u => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()));
