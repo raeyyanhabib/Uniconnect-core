@@ -1,4 +1,4 @@
-# 🚀 sda-uniconnect
+# 🚀 uniConnect
 
 Yo, welcome to **sda-uniconnect**! 🎉 This is the central hub where everything comes together. Grab a coffee, stretch those fingers, and let's dive into what makes this project tick.
 
